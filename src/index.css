@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  #root {
+    min-height: 100vh;
+    background-color: hsl(223, 19%, 93%);
+  }
+  
+  .author {
+    @apply font-bold text-blue-600;
+  }
+}
