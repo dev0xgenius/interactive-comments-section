@@ -73,7 +73,11 @@ let appData = {
   return (
     <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
       <Comments data={appData.comments} />
-      <ReplyForm user={appData.currentUser}/>
+      <ReplyForm 
+        user={appData.currentUser}
+        keepOpen={true}
+        placeholder="Add a comment..."
+      />
     </div>
   );
 };
