@@ -1,6 +1,6 @@
 {
   "currentUser": {
-    "image": { 
+    "image": {
       "png": "./images/avatars/image-juliusomo.png",
       "webp": "./images/avatars/image-juliusomo.webp"
     },
@@ -13,7 +13,7 @@
       "createdAt": "1 month ago",
       "score": 12,
       "user": {
-        "image": { 
+        "image": {
           "png": "./images/avatars/image-amyrobson.png",
           "webp": "./images/avatars/image-amyrobson.webp"
         },
@@ -27,7 +27,7 @@
       "createdAt": "2 weeks ago",
       "score": 5,
       "user": {
-        "image": { 
+        "image": {
           "png": "./images/avatars/image-maxblagun.png",
           "webp": "./images/avatars/image-maxblagun.webp"
         },
@@ -41,7 +41,7 @@
           "score": 4,
           "replyingTo": "maxblagun",
           "user": {
-            "image": { 
+            "image": {
               "png": "./images/avatars/image-ramsesmiron.png",
               "webp": "./images/avatars/image-ramsesmiron.webp"
             },
@@ -55,7 +55,7 @@
           "score": 2,
           "replyingTo": "ramsesmiron",
           "user": {
-            "image": { 
+            "image": {
               "png": "./images/avatars/image-juliusomo.png",
               "webp": "./images/avatars/image-juliusomo.webp"
             },
@@ -63,6 +63,118 @@
           }
         }
       ]
+    },
+    {
+      "id": 1731049957,
+      "content": "God did",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731050773,
+      "content": "One day, i'mma be a great man",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731058908,
+      "content": "Housefull",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731058915,
+      "content": "Housefull",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731058916,
+      "content": "Housefull",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731105590,
+      "content": "God did",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731105593,
+      "content": "God did",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731106229,
+      "content": "When",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
     }
   ]
 }

@@ -1,83 +1,77 @@
-import { Comments } from './Comments.jsx'
-import ReplyForm from './ReplyForm.jsx'
+import Comments from './Comments'
+import ReplyForm from './ReplyForm'
+import { useEffect, useState, useContext } from 'react';
+import client from '../api/client';
+import { UserContext } from "../../utils/contexts/UserContext";
 
 export default function App() {
-let appData = {
-  "currentUser": {
-    "image": { 
-      "png": "./images/avatars/image-juliusomo.png",
-      "webp": "./images/avatars/image-juliusomo.webp"
-    },
-    "username": "juliusomo"
-  },
-  "comments": [
-    {
-      "id": 1,
-      "content": "Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.",
-      "createdAt": "1 month ago",
-      "score": 12,
-      "user": {
-        "image": { 
-          "png": "./images/avatars/image-amyrobson.png",
-          "webp": "./images/avatars/image-amyrobson.webp"
-        },
-        "username": "amyrobson"
-      },
-      "replies": []
-    },
-    {
-      "id": 2,
-      "content": "Woah, your project looks awesome! How long have you been coding for? I'm still new, but think I want to dive into React as well soon. Perhaps you can give me an insight on where I can learn React? Thanks!",
-      "createdAt": "2 weeks ago",
-      "score": 5,
-      "user": {
-        "image": { 
-          "png": "./images/avatars/image-maxblagun.png",
-          "webp": "./images/avatars/image-maxblagun.webp"
-        },
-        "username": "maxblagun"
-      },
-      "replies": [
-        {
-          "id": 3,
-          "content": "If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.",
-          "createdAt": "1 week ago",
-          "score": 4,
-          "replyingTo": "maxblagun",
-          "user": {
-            "image": { 
-              "png": "./images/avatars/image-ramsesmiron.png",
-              "webp": "./images/avatars/image-ramsesmiron.webp"
-            },
-            "username": "ramsesmiron"
-          }
-        },
-        {
-          "id": 4,
-          "content": "I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
-          "createdAt": "2 days ago",
-          "score": 2,
-          "replyingTo": "ramsesmiron",
-          "user": {
-            "image": { 
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          }
-        }
-      ]
+  const [appData, setAppData] = useState();
+
+  const generateID = (usedIDs = new Set([])) => {
+    let newID = null;
+    let idExists = false;
+
+    do { // Reset ID if it exists
+      newID = Math.floor(Date.now() / 1000);
+    } while (usedIDs.has(newID));
+
+    // Add matching ID into usedIDs Set Object for tracking
+    for (const comment of appData.comments) {
+      const { id } = comment;
+      if (Number(id) === newID) {
+        idExists = true;
+        usedIDs.add(Number(id));
+      }
     }
-  ]
-};
-  return (
-    <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
-      <Comments data={appData.comments} />
-      <ReplyForm 
-        user={appData.currentUser}
-        keepOpen={true}
-        placeholder="Add a comment..."
-      />
+    return (idExists) ? generateID(usedIDs) : newID;
+  };
+
+  const addComment = (comment) => {
+    const newComment = {
+      id: generateID(),
+      content: comment,
+      score: 0,
+      createdAt: "Now",
+      user: appData.currentUser,
+      replies: []
+    };
+
+    let updatedComments = [...appData.comments, newComment];
+    setAppData(currentState =>
+      Object.assign(
+        {}, currentState, { comments: updatedComments })
+    ); client.addComment(newComment);
+
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let t = setInterval(() => {
+      client.getComments(data => setAppData(currentState =>
+        Object.assign({}, currentState, data))
+        , controller);
+    }, 50);
+
+    return () => {
+      controller.abort();
+      clearInterval(t);
+    }
+  }, []);
+
+  return (appData != null) ? (
+    <UserContext.Provider value={appData.currentUser}>
+      <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
+        <Comments data={appData.comments} />
+        <ReplyForm
+          keepOpen={true}
+          placeholder="Add a comment..."
+          action={addComment}
+        />
+      </div>
+    </UserContext.Provider>
+  ) : (
+    <div className="bg-white rounded-xl font-mono flex justify-center items-center p-8">
+      <p className="text-md">Couldn't Fetch Data...</p>
     </div>
   );
 };

@@ -2,10 +2,14 @@ import PropTypes from 'prop-types'
 import Counter from './Counter.jsx'
 import ReplyForm from './ReplyForm.jsx'
 import { useState } from 'react'
+import UserOptions from './UserOptions'
 
 export default function Comment(props) {
   const [formOpen, setFormOpen] = useState(false);
+  //const [counter, setCounter] = useState(props.score);
+  
   const toggleForm = () => setFormOpen(currentState => !currentState);
+  //const vote = (num) => setCounter(currentState => currentState + (num));
   
   return (
     <div className='flex flex-col gap-4'>
@@ -27,23 +31,19 @@ export default function Comment(props) {
           </main>
           <footer>
             <div className="comment-actions w-full flex justify-between">
-              <Counter count={props.score}/>
-              <button 
-                className='flex items-center gap-2'
-                onClick={toggleForm}
-              >
-                <i className='w-4'>
-                  <img src='../../images/icon-reply.svg'
-                    width="100%" height="auto"/>
-                </i>
-                <span className='font-extrabold text-blue-300'>Reply</span>
-              </button>
+              <Counter 
+                count={props.score}
+                //vote={vote}
+              />
+              <UserOptions 
+                user={props.user}
+                toggleForm={toggleForm}
+              />
             </div>
           </footer>
         </div>
       </div>
-      <ReplyForm 
-        user={props.user}
+      <ReplyForm
         keepOpen={formOpen}
       />
     </div>
@@ -51,7 +51,7 @@ export default function Comment(props) {
 };
 
 Comment.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
   author: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
@@ -59,7 +59,7 @@ Comment.propTypes = {
   
   replies: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
       author: PropTypes.string.isRequired,
       content: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
@@ -70,9 +70,9 @@ Comment.propTypes = {
   
   user: PropTypes.shape({
     image: { 
-      png: "./images/avatars/image-juliusomo.png",
-      webp: "./images/avatars/image-juliusomo.webp"
+      png: PropTypes.string,
+      webp: PropTypes.string
     },
-    username: "juliusomo"
+    username: PropTypes.string
   }).isRequired
 };

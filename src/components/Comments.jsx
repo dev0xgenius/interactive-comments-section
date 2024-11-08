@@ -2,36 +2,38 @@ import PropTypes from 'prop-types'
 import Comment from './Comment'
 
 function Replies(props) {
-  const replyText = (replyingTo, content)=> {
-    return <>
-    <span className='author text-blue-300'>
-      @{replyingTo}
-      </span> {content}
-    </>
+  const replyText = (replyingTo, content) => {
+    return (
+      <>
+        <span className='author text-blue-300'>
+          @{replyingTo}
+        </span> {content}
+      </>
+    )
   };
-  
+
   return (props.data.length == 0) ?
     <></> : (
-    <ul className='border-l-2 pl-5 flex flex-col gap-4 py-4'>
-    {
-      props.data.map(reply => {
-        return <li key={reply.id}>
-          <Comment
-            id={reply.id}
-            content={replyText(reply.replyingTo, reply.content)}
-            createdAt={reply.createdAt}
-            score={reply.score}
-            user={reply.user}
-            author={reply.user.username}
-          />
-        </li>
-      })
-    }
-    </ul>
-  );
+      <ul className='border-l-2 pl-5 flex flex-col gap-4 py-4'>
+        {
+          props.data.map(reply => {
+            return <li key={reply.id}>
+              <Comment
+                id={reply.id}
+                content={replyText(reply.replyingTo, reply.content)}
+                createdAt={reply.createdAt}
+                score={reply.score}
+                user={reply.user}
+                author={reply.user.username}
+              />
+            </li>
+          })
+        }
+      </ul>
+    );
 }
 
-export function Comments(props) {
+export default function Comments(props) {
   let comments = props.data;
   comments = comments.map(comment => {
     return (
@@ -45,14 +47,14 @@ export function Comments(props) {
           author={comment.user.username}
           replies={comment.replies}
         />
-        <Replies data={comment.replies}/>
+        <Replies data={comment.replies} />
       </li>
     );
   })
-  
+
   return (
     <div className="wrapper">
-      <ul className='flex flex-col gap-4 py-4'>{ comments }</ul>
+      <ul className='flex flex-col gap-4 py-4'>{comments}</ul>
     </div>
   );
 };
@@ -60,15 +62,15 @@ export function Comments(props) {
 Comments.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
       author: PropTypes.string.isRequired,
       content: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
       score: PropTypes.number.isRequired,
-      
+
       replies: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.string.isRequired,
+          id: PropTypes.number.isRequired,
           author: PropTypes.string.isRequired,
           content: PropTypes.string.isRequired,
           createdAt: PropTypes.string.isRequired,
@@ -76,13 +78,13 @@ Comments.propTypes = {
           replyingTo: PropTypes.string.isRequired
         })
       ),
-      
+
       user: PropTypes.shape({
-        image: { 
-          png: "./images/avatars/image-juliusomo.png",
-          webp: "./images/avatars/image-juliusomo.webp"
+        image: {
+          png: PropTypes.string,
+          webp: PropTypes.string
         },
-        username: "juliusomo"
+        username: PropTypes.string
       }).isRequired
     })
   )
@@ -91,15 +93,15 @@ Comments.propTypes = {
 Replies.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
       author: PropTypes.string.isRequired,
       content: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
       score: PropTypes.number.isRequired,
-      
+
       replies: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.string.isRequired,
+          id: PropTypes.number.isRequired,
           author: PropTypes.string.isRequired,
           content: PropTypes.string.isRequired,
           createdAt: PropTypes.string.isRequired,
@@ -107,13 +109,13 @@ Replies.propTypes = {
           replyingTo: PropTypes.string.isRequired
         })
       ),
-      
+
       user: PropTypes.shape({
-        image: { 
-          png: "./images/avatars/image-juliusomo.png",
-          webp: "./images/avatars/image-juliusomo.webp"
+        image: {
+          png: PropTypes.string,
+          webp: PropTypes.string
         },
-        username: "juliusomo"
+        username: PropTypes.string
       }).isRequired
     })
   )

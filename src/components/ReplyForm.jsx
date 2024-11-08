@@ -1,32 +1,48 @@
 import PropTypes from 'prop-types'
+import { useContext } from 'react';
+import { UserContext } from '../../utils/contexts/UserContext';
 
-export default function ReplyForm({user, placeholder, keepOpen}) {
-  return (keepOpen) ? (
-    <div className='wrapper bg-white-100 rounded-2xl p-5'>
-      <form className='grid gap-4'>
-        <textarea className='rounded-xl w-full border px-5 py-2.5 resize-none h-20'
-          placeholder={placeholder || "Reply..."}>
+export default function ReplyForm(props) {
+  const user = useContext(UserContext);
+  
+  const submitReply = (evt) => {
+    evt.preventDefault(); // Prevent default event handler
+    
+    let formData = new FormData(evt.target);
+    let replyContent = formData.get("content");
+    
+    if (props.action && replyContent)
+      props.action(replyContent);
+  };
+  
+  return (props.keepOpen) ? (
+    <form onSubmit={submitReply}
+      className='wrapper bg-white-100 rounded-2xl p-5'>
+      <div className='grid gap-4'>
+        <textarea
+          name='content' 
+          className='rounded-xl w-full border px-5 py-2.5 resize-none h-20'
+          placeholder={props.placeholder || "Reply..."}
+        >
         </textarea>
         <span className='flex justify-between items-center'>
           <span className='inline-block w-8'>
-            <img src={user.image.png} width='100%' height='auto'/>
+            <img src={user.image.png} width='100%' height='auto' />
           </span>
-          <button className='rounded-xl bg-blue-300 w-32 font-bold text-white-100 p-4'>SEND</button>
+          <button
+            type='submit'
+            className='rounded-xl bg-blue-300 w-32 font-bold text-white-100 p-4'
+          >
+            SEND
+          </button>
         </span>
-      </form>
-    </div>
+      </div>
+    </form>
   ) : <></>;
 };
 
 ReplyForm.propTypes = {
-  user: PropTypes.shape({
-    image: { 
-      png: "./images/avatars/image-juliusomo.png",
-      webp: "./images/avatars/image-juliusomo.webp"
-    },
-    username: "juliusomo"
-  }).isRequired,
-  
+  action: PropTypes.func,
   placeholder: PropTypes.string,
   keepOpen: PropTypes.bool.isRequired
 };
