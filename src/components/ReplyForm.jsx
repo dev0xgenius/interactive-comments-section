@@ -11,8 +11,8 @@ export default function ReplyForm(props) {
     let formData = new FormData(evt.target);
     let replyContent = formData.get("content");
     
-    if (props.action && replyContent)
-      props.action(replyContent);
+    if (props.action && replyContent.trim()) props.action(replyContent);
+    evt.target.querySelector("[name='content']").value = "";
   };
   
   return (props.keepOpen) ? (

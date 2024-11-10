@@ -3,13 +3,28 @@ import ReplyForm from './ReplyForm'
 import { useEffect, useState, useContext } from 'react';
 import client from '../api/client';
 import { UserContext } from "../../utils/contexts/UserContext";
+import { generateID } from '../../utils/helpers.js'
 
 export default function App() {
   const [appData, setAppData] = useState();
 
+  useEffect(() => {
+    const controller = new AbortController();
+    //let t = setInterval(() => {
+      client.getComments(data => setAppData(
+        currentState => ({...data}))
+      ,controller);
+   // }, 50);
+
+    return () => {
+      controller.abort();
+      //clearInterval(t);
+    }
+  }, []);
+
   const addComment = (comment) => {
     const newComment = {
-      id: Math.floor(Date.now() / 1000),
+      id: generateID(appData.comments),
       content: comment,
       score: 0,
       createdAt: "Now",
@@ -22,27 +37,31 @@ export default function App() {
       Object.assign(
         {}, currentState, { comments: updatedComments })
     ); client.addComment(newComment);
-
   };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let t = setInterval(() => {
-      client.getComments(data => setAppData(
-        currentState => ({...data}))
-      ,controller);
-    }, 50);
-
-    return () => {
-      controller.abort();
-      clearInterval(t);
-    }
-  }, []);
+  
+  const addReply = (reply, commentID) => {
+    let updatedComments = appData.comments.map(comment => {
+      if (comment.id === commentID) {
+        let updatedReplies = comment.replies.concat(reply);
+        return Object.assign({}, comment, 
+          { replies: updatedReplies }
+        ); 
+      }
+      return comment;
+    });
+    
+    setAppData(currentState => Object.assign(
+      {}, currentState, { comments: updatedComments }
+    ));
+  };
 
   return (appData != null) ? (
     <UserContext.Provider value={appData.currentUser}>
       <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
-        <Comments data={appData.comments} />
+        <Comments 
+          data={appData.comments}
+          handleReply={addReply}
+        />
         <ReplyForm
           keepOpen={true}
           placeholder="Add a comment..."

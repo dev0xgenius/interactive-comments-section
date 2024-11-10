@@ -1,12 +1,29 @@
 import PropTypes from 'prop-types'
 import Counter from './Counter.jsx'
 import ReplyForm from './ReplyForm.jsx'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import UserOptions from './UserOptions'
+import { generateID } from '../../utils/helpers.js'
+import { UserContext } from '../../utils/contexts/UserContext.js'
 
 export default function Comment(props) {
   const [formOpen, setFormOpen] = useState(false);
+  const loggedUser = useContext(UserContext);
+  
   const toggleForm = () => setFormOpen(currentState => !currentState);
+  const addReply = (replyText) => {
+    const newReply = {
+      id: Math.floor(Date.now() / 1000),
+      content: replyText,
+      createdAt: "Now",
+      score: 0,
+      user: loggedUser,
+      replyingTo: props.user.username
+    };
+    
+    props.handleReply(newReply, props.commentID || props.id);
+    toggleForm();
+  };
   
   return (
     <div className='flex flex-col gap-4'>
@@ -39,6 +56,7 @@ export default function Comment(props) {
       </div>
       <ReplyForm
         keepOpen={formOpen}
+        action={addReply}
       />
     </div>
   );
@@ -74,5 +92,7 @@ Comment.propTypes = {
       webp: PropTypes.string
     },
     username: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  
+  handleReply: PropTypes.func.isRequired
 };

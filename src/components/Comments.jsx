@@ -13,8 +13,15 @@ export default function Comments(props) {
           createdAt={comment.createdAt}
           score={comment.score}
           user={comment.user}
+          replies={comment.replies}
+          
+          handleReply={props.handleReply}
         />
-        <Replies data={comment.replies} />
+        <Replies 
+          data={comment.replies}
+          commentID={comment.id}
+          handleReply={props.handleReply}
+        />
       </li>
     );
   })
@@ -27,6 +34,7 @@ export default function Comments(props) {
 };
 
 Comments.propTypes = {
+  handleReply: PropTypes.func.isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
