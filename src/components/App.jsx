@@ -7,28 +7,9 @@ import { UserContext } from "../../utils/contexts/UserContext";
 export default function App() {
   const [appData, setAppData] = useState();
 
-  const generateID = (usedIDs = new Set([])) => {
-    let newID = null;
-    let idExists = false;
-
-    do { // Reset ID if it exists
-      newID = Math.floor(Date.now() / 1000);
-    } while (usedIDs.has(newID));
-
-    // Add matching ID into usedIDs Set Object for tracking
-    for (const comment of appData.comments) {
-      const { id } = comment;
-      if (Number(id) === newID) {
-        idExists = true;
-        usedIDs.add(Number(id));
-      }
-    }
-    return (idExists) ? generateID(usedIDs) : newID;
-  };
-
   const addComment = (comment) => {
     const newComment = {
-      id: generateID(),
+      id: Math.floor(Date.now() / 1000),
       content: comment,
       score: 0,
       createdAt: "Now",
@@ -47,9 +28,9 @@ export default function App() {
   useEffect(() => {
     const controller = new AbortController();
     let t = setInterval(() => {
-      client.getComments(data => setAppData(currentState =>
-        Object.assign({}, currentState, data))
-        , controller);
+      client.getComments(data => setAppData(
+        currentState => ({...data}))
+      ,controller);
     }, 50);
 
     return () => {

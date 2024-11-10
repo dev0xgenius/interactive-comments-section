@@ -6,10 +6,7 @@ import UserOptions from './UserOptions'
 
 export default function Comment(props) {
   const [formOpen, setFormOpen] = useState(false);
-  //const [counter, setCounter] = useState(props.score);
-  
   const toggleForm = () => setFormOpen(currentState => !currentState);
-  //const vote = (num) => setCounter(currentState => currentState + (num));
   
   return (
     <div className='flex flex-col gap-4'>
@@ -21,7 +18,7 @@ export default function Comment(props) {
                 <span className='inline-block w-8 h-8'>
                   <img src={props.user.image.png} width='100%' height='auto'/>
                 </span>
-                <span className='author'>{props.author}</span>
+                <span className='author'>{props.user.username}</span>
               </span>
               <span className='text-blue-500'>{props.createdAt}</span>
             </div>
@@ -31,10 +28,7 @@ export default function Comment(props) {
           </main>
           <footer>
             <div className="comment-actions w-full flex justify-between">
-              <Counter 
-                count={props.score}
-                //vote={vote}
-              />
+              <Counter count={props.score}/>
               <UserOptions 
                 user={props.user}
                 toggleForm={toggleForm}
@@ -52,7 +46,6 @@ export default function Comment(props) {
 
 Comment.propTypes = {
   id: PropTypes.number.isRequired,
-  author: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
@@ -60,11 +53,18 @@ Comment.propTypes = {
   replies: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      author: PropTypes.string.isRequired,
       content: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
       score: PropTypes.number.isRequired,
-      replyingTo: PropTypes.string.isRequired
+      replyingTo: PropTypes.string.isRequired,
+      
+      user: PropTypes.shape({
+        image: { 
+          png: PropTypes.string,
+          webp: PropTypes.string
+        },
+        username: PropTypes.string
+      }).isRequired
     })
   ),
   

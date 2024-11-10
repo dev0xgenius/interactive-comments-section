@@ -175,6 +175,34 @@
         "username": "juliusomo"
       },
       "replies": []
+    },
+    {
+      "id": 1731197434,
+      "content": "2hen",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731197439,
+      "content": "Then",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
     }
   ]
 }
