@@ -6,6 +6,43 @@ const path = require('path');
 
 const app = express();
 
+const FILEPATH = path.join(process.env.PWD, "data.json");
+
+let server = {
+  version: 0,
+  waiting: [],
+};
+
+server.waitForChanges = function(time) {
+  return new Promise(resolve => {
+    server.waiting.push(resolve);
+    setTimeout(() => {
+      if (!server.waiting.includes(resolve)) return;
+      server.waiting = server.waiting.filter(r => r != resolve);
+      resolve({status: 304});
+    }, time * 1000);
+  });
+};
+
+server.updated = function() {
+  server.version += 1;
+  getJSON(FILEPATH)
+    .then(data => {
+      let response = {
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type" : "application/json",
+          "ETag" : `"${server.version}"`,
+          "Cache-Control" : "no-store"
+          }
+      };
+      
+      server.waiting.forEach(resolve => resolve(response));
+    });
+    
+  server.waiting = [];
+};
+
 function getJSON(jsonFile) {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(jsonFile);
@@ -13,7 +50,7 @@ function getJSON(jsonFile) {
     let streamOutput = null;
     readStream.on("data", dataChunk => 
       streamOutput = dataChunk.toString());
-    
+      
     readStream.on('end', (err) => {
       if (err) reject("Something bad occured...");
       
@@ -24,18 +61,31 @@ function getJSON(jsonFile) {
   });
 }
 
-app.get("/api/comments", (_, res) => {
-  let filePath = path.join(process.env.PWD, 'data.json');
-  if (!fs.existsSync(filePath)) {
-    res.statusCode = 304;
-    return;
-  }
+app.get("/api/comments", (req, res) => {
+  let tag = /"(.*)"/.exec(req.headers["if-none-match"]); 
+  let wait = /\bwait=(\d+)/.exec(req.headers.Prefer);
   
-  fs.readFile(filePath, "utf-8", (error, data) => {
-    if (error) console.error(error);
-    res.writeHead(200, {"Content-Type":"application/json"});
-    res.end(data);
-  });
+  if (!tag || Number(tag[1]) != server.version) {
+    getJSON(path.join(process.env.PWD, 'data.json'))
+      .then(data => {
+        res.writeHead(200, {
+          "Content-Type" : "application/json",
+          "ETag" : `"${server.version}"`,
+          "Cache-Control" : "no-store"
+        });
+        
+        //res.body = JSON.stringify(data);
+        res.status = 200;
+        res.end(JSON.stringify(data));
+      });
+  } else if (!wait) { res.status = 304; }
+  else { 
+    server.waitForChanges(Number(wait[1]))
+      .then(response => {
+        Object.assign(res, response);
+        res.end();
+      });
+  }
 });
 
 app.put("/api/comments/add", (req, res) => {
@@ -44,23 +94,20 @@ app.put("/api/comments/add", (req, res) => {
     newComment = JSON.parse(dataChunk.toString());
     
     if (newComment != null) {
-      let filePath = path.join(process.env.PWD, 'data.json');
-      
-      getJSON(filePath).then(data => {
+      getJSON(FILEPATH).then(data => {
+        res.statusCode = 200;
         let updatedComments = [...data.comments, newComment];
         let updatedData = {...data, comments: updatedComments};
         
         fsPromises.writeFile(
-          filePath,
+          FILEPATH,
           JSON.stringify(updatedData, null, 2)
         ).catch(err => console.log(`Fatal Error: ${err}`));
         
+        server.updated();
       }).catch(err => console.log(err));
     }
   });
-  
-  res.statusCode = 200;
-  res.end();
 });
 
-ViteExpress.listen(app, 5173, () => console.log("Server is listening..."));
+ViteExpress.listen(app, 5173, () => console.log(`Server running on 5173`));

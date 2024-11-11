@@ -1,22 +1,33 @@
-function getComments(success=() => {}, controller={signal: null}) {
-  return fetch("/api/comments", {
-    headers: { Accept: "application/json" },
-    signal: controller.signal
-  }).catch(err => alert(`Couldn't fetch data: ${err}`))
-    .then(checkStatus)
-    .then(parseJSON)
-    .then(success);
-}
-
-function checkStatus(response) {
-  if (response.ok && 
-    response.headers.get("Content-Type") === "application/json") 
-    return response.text();
-  else console.log(response.statusText);
-}
-
-function parseJSON(data) {
-  return JSON.parse(data);
+async function getComments(success, controller={signal: null}) {
+  let tag;
+  for (;;) {
+    let response;
+    try {
+      response = await fetch("/api/comments", {
+        headers: tag && {
+          Accept: "application/json",
+          "If-None-Match": tag,
+          Prefer: "wait=90",
+        },
+        signal: controller.signal
+      });
+    } catch(e) {
+      console.log(`Response failed: ${e}`);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Pauses program for 0.5s
+      continue;
+    }
+    
+    if (response.status == 304) continue;
+    tag = response.headers.get("ETag");
+    
+    if (
+      response.ok && 
+      response.headers.get("Content-Type") == "application/json") 
+    {
+      let data = await response.json();
+      success(data);
+    }
+  }
 }
 
 function addComment(comment){

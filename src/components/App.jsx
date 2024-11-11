@@ -10,15 +10,12 @@ export default function App() {
 
   useEffect(() => {
     const controller = new AbortController();
-    //let t = setInterval(() => {
-      client.getComments(data => setAppData(
-        currentState => ({...data}))
-      ,controller);
-   // }, 50);
-
+    client.getComments(
+      data => setAppData(currentState => ({...data}))
+    , controller);
+    
     return () => {
       controller.abort();
-      //clearInterval(t);
     }
   }, []);
 

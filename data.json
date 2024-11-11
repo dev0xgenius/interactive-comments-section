@@ -329,6 +329,34 @@
         "username": "juliusomo"
       },
       "replies": []
+    },
+    {
+      "id": 1731329783,
+      "content": "God bless america",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
+    },
+    {
+      "id": 1731329808,
+      "content": "When did you hesr",
+      "score": 0,
+      "createdAt": "Now",
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
     }
   ]
 }
