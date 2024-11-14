@@ -1,10 +1,11 @@
-import PropTypes from 'prop-types'
-import Counter from './Counter.jsx'
-import ReplyForm from './ReplyForm.jsx'
-import { useState, useContext } from 'react'
+import Counter from './Counter'
+import ReplyForm from './ReplyForm'
 import UserOptions from './UserOptions'
+import UserTag from './UserTag'
+import PropTypes from 'prop-types'
+import { useState, useContext } from 'react'
 import { generateID } from '../../utils/helpers.js'
-import { UserContext } from '../../utils/contexts/UserContext.js'
+import { UserContext } from '../../utils/contexts/UserContext'
 
 export default function Comment(props) {
   const [formOpen, setFormOpen] = useState(false);
@@ -21,7 +22,7 @@ export default function Comment(props) {
       replyingTo: props.user.username
     };
     
-    props.handleReply(newReply, props.commentID || props.id);
+    props.actions.addReply(newReply, props.commentID || props.id);
     toggleForm();
   };
   
@@ -31,12 +32,7 @@ export default function Comment(props) {
         <div className="container grid gap-4 h-max">
           <header>
             <div className="comment-info flex gap-4 items-center">
-              <span className="user flex gap-4 items-center">
-                <span className='inline-block w-8 h-8'>
-                  <img src={props.user.image.png} width='100%' height='auto'/>
-                </span>
-                <span className='author'>{props.user.username}</span>
-              </span>
+              <UserTag user={props.user}/>
               <span className='text-blue-500'>{props.createdAt}</span>
             </div>
           </header>
@@ -94,5 +90,5 @@ Comment.propTypes = {
     username: PropTypes.string
   }).isRequired,
   
-  handleReply: PropTypes.func.isRequired
+  actions: PropTypes.arrayOf(PropTypes.func)
 };

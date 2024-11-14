@@ -15,12 +15,12 @@ export default function Comments(props) {
           user={comment.user}
           replies={comment.replies}
           
-          handleReply={props.handleReply}
+          actions={props.actions}
         />
         <Replies 
           data={comment.replies}
           commentID={comment.id}
-          handleReply={props.handleReply}
+          actions={props.actions}
         />
       </li>
     );

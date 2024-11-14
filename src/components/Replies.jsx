@@ -1,10 +1,7 @@
 import PropTypes from 'prop-types'
 import Comment from './Comment'
-// import { useContext } from 'react'
-// import { UserContext } from '../../utils/contexts/UserContext.js'
 
-export default function Replies({data, commentID, handleReply}) {
- // const loggedUser = useContext(UserContext);
+export default function Replies({data, commentID, actions}) {
   const replyText = (replyingTo, content) => {
   return (
     <>
@@ -28,7 +25,7 @@ export default function Replies({data, commentID, handleReply}) {
               user={reply.user}
               
               commentID={commentID}
-              handleReply={handleReply}
+              actions={actions}
             />
           </li>
         })

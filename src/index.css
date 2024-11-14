@@ -11,4 +11,6 @@
   .author {
     @apply font-bold text-blue-600;
   }
+  
+  .modal-bg { background-color: rgba(0,0,0,0.3); }
 }

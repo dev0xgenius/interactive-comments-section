@@ -1,13 +1,14 @@
 import Comments from './Comments'
 import ReplyForm from './ReplyForm'
+import Modal from './Modal'
 import { useEffect, useState, useContext } from 'react';
 import client from '../api/client';
 import { UserContext } from "../../utils/contexts/UserContext";
-import { generateID } from '../../utils/helpers.js'
+import { generateID } from '../../utils/helpers'
 
 export default function App() {
   const [appData, setAppData] = useState();
-
+  
   useEffect(() => {
     const controller = new AbortController();
     client.getComments(
@@ -49,15 +50,29 @@ export default function App() {
     
     setAppData(currentState => Object.assign(
       {}, currentState, { comments: updatedComments }
-    ));
+    )); client.addReply(reply, commentID);
   };
+  
+  const deleteReply = () => {
+    
+  };
+  
+  const editReply = () => {}
+  const getModalRes = () => {}
 
   return (appData != null) ? (
     <UserContext.Provider value={appData.currentUser}>
+      <Modal
+        mainMsg="Are you sure you want to remove this comment?
+        This will remove the comment and can't be undone"
+        headerMsg="Delete Comment"
+        isOpen={false}
+        getModalRes={getModalRes}
+      />
       <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
         <Comments 
           data={appData.comments}
-          handleReply={addReply}
+          actions={{addReply, deleteReply, editReply}}
         />
         <ReplyForm
           keepOpen={true}
