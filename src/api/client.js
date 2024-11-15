@@ -39,7 +39,17 @@ function addComment(comment){
     .catch(err => "Couldn't fetch data...");
 }
 
+function addReply(reply, commentID) {
+  reply.commentID = commentID;
+  fetch("/api/comments/add/reply", {
+    headers: {"Content-Type" : "application/json"},
+    method: "POST",
+    body: JSON.stringify(reply),
+  }).catch(err => console.error("Fucking hell mate!!!"));
+}
+
 export default {
   getComments,
-  addComment
+  addComment,
+  addReply
 };

@@ -5,8 +5,7 @@ const fsPromises = require("fs").promises;
 const path = require('path');
 
 const app = express();
-
-const FILEPATH = path.join(process.env.PWD, "data.json");
+const FILEPATH = path.join(process.cwd(), "data.json");
 
 let server = {
   version: 0,
@@ -74,7 +73,6 @@ app.get("/api/comments", (req, res) => {
           "Cache-Control" : "no-store"
         });
         
-        //res.body = JSON.stringify(data);
         res.status = 200;
         res.end(JSON.stringify(data));
       });
@@ -95,9 +93,39 @@ app.put("/api/comments/add", (req, res) => {
     
     if (newComment != null) {
       getJSON(FILEPATH).then(data => {
-        res.statusCode = 200;
+        res.status(200);
         let updatedComments = [...data.comments, newComment];
         let updatedData = {...data, comments: updatedComments};
+        
+        fsPromises.writeFile(
+          FILEPATH,
+          JSON.stringify(updatedData, null, 2)
+        ).catch(err => console.log(`Fatal Error: ${err}`));
+        
+        server.updated();
+      }).catch(err => console.log(err));
+    }
+  });
+});
+
+app.post("/api/comments/add/reply", (req, res) => {
+  let newReply = null;
+  req.on("data", dataChunk => {
+    newReply = JSON.parse(dataChunk.toString());
+    
+    if (newReply != null) {
+      getJSON(FILEPATH).then(data => {
+        res.status(200);
+        let updatedComments = data.comments.map(comment => {
+          if (comment.id === newReply.commentID) {
+            delete newReply.commentID;
+            let updatedReplies = comment.replies.concat(newReply);
+            return Object.assign({}, comment, 
+              { replies: updatedReplies }
+            ); 
+          }
+          return comment;
+        }); let updatedData = {...data, comments: updatedComments};
         
         fsPromises.writeFile(
           FILEPATH,

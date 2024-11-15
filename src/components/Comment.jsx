@@ -12,6 +12,7 @@ export default function Comment(props) {
   const loggedUser = useContext(UserContext);
   
   const toggleForm = () => setFormOpen(currentState => !currentState);
+  
   const addReply = (replyText) => {
     const newReply = {
       id: Math.floor(Date.now() / 1000),
@@ -22,8 +23,8 @@ export default function Comment(props) {
       replyingTo: props.user.username
     };
     
-    props.actions.addReply(newReply, props.commentID || props.id);
     toggleForm();
+    props.actions.addReply(newReply, props.commentID || props.id);
   };
   
   return (
