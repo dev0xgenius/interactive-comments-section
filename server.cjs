@@ -5,7 +5,9 @@ const fsPromises = require("fs").promises;
 const path = require('path');
 
 const app = express();
-const FILEPATH = path.join(process.cwd(), "data.json");
+
+const FILEPATH = path.join(process.env.PWD, "data.json");
+const PORT = process.env.PORT || 5173;
 
 let server = {
   version: 0,
@@ -44,19 +46,21 @@ server.updated = function() {
 
 function getJSON(jsonFile) {
   return new Promise((resolve, reject) => {
-    const readStream = fs.createReadStream(jsonFile);
-    
-    let streamOutput = null;
-    readStream.on("data", dataChunk => 
+    try { 
+      const readStream = fs.createReadStream(jsonFile);
+      
+      let streamOutput = null;
+      readStream.on("data", dataChunk => 
       streamOutput = dataChunk.toString());
-      
-    readStream.on('end', (err) => {
-      if (err) reject("Something bad occured...");
-      
-      streamOutput = JSON.parse(streamOutput);
-      if (streamOutput != null) resolve(streamOutput);
-      else reject("Couldn't parse file...");
-    });
+        
+      readStream.on('end', (err) => {
+        if (err) reject("Something bad occured...");
+          
+        streamOutput = JSON.parse(streamOutput);
+        if (streamOutput != null) resolve(streamOutput);
+        else reject("Couldn't parse file...");
+      });
+    } catch(e) { console.error(e); }
   });
 }
 
@@ -65,17 +69,16 @@ app.get("/api/comments", (req, res) => {
   let wait = /\bwait=(\d+)/.exec(req.headers.Prefer);
   
   if (!tag || Number(tag[1]) != server.version) {
-    getJSON(path.join(process.env.PWD, 'data.json'))
-      .then(data => {
-        res.writeHead(200, {
-          "Content-Type" : "application/json",
-          "ETag" : `"${server.version}"`,
-          "Cache-Control" : "no-store"
-        });
-        
-        res.status = 200;
-        res.end(JSON.stringify(data));
+    getJSON(FILEPATH).then(data => {
+      res.writeHead(200, {
+        "Content-Type" : "application/json",
+        "ETag" : `"${server.version}"`,
+        "Cache-Control" : "no-store"
       });
+      
+      res.status = 200;
+      res.end(JSON.stringify(data));
+    });
   } else if (!wait) { res.status = 304; }
   else { 
     server.waitForChanges(Number(wait[1]))
@@ -110,9 +113,8 @@ app.put("/api/comments/add", (req, res) => {
 
 app.post("/api/comments/add/reply", (req, res) => {
   let newReply = null;
-  req.on("data", dataChunk => {
-    newReply = JSON.parse(dataChunk.toString());
-    
+  req.on("data", dataChunk => newReply = JSON.parse(dataChunk.toString()));
+  req.on('end', () => {
     if (newReply != null) {
       getJSON(FILEPATH).then(data => {
         res.status(200);
@@ -138,4 +140,25 @@ app.post("/api/comments/add/reply", (req, res) => {
   });
 });
 
-ViteExpress.listen(app, 5173, () => console.log(`Server running on 5173`));
+app.delete("/api/comments/delete", (req, res) => {
+  let replyID = NaN;
+  req.on('data', data => replyID = Number(data.toString()));
+  req.on('end', () => {
+    getJSON(FILEPATH).then(data => {
+      let updatedComments = data.comments.filter(comment => {
+        if (comment.replies.length != 0)
+          comment.replies = comment.replies.filter(reply => reply.id != replyID);
+        return (comment.id != replyID);
+      }); let updatedData = {...data, comments: updatedComments};
+      
+      fsPromises.writeFile(
+        FILEPATH,
+        JSON.stringify(updatedData, null, 2)
+      ).catch(err => console.log(`Fatal Error: ${err}`));
+      
+      server.updated();
+    }).catch(err => console.error(err));
+  });
+});
+
+ViteExpress.listen(app, PORT, () => console.log(`Server running on ${PORT}`));

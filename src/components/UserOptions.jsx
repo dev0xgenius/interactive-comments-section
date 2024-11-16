@@ -7,7 +7,10 @@ export default function UserOptions(props) {
   return (props.user.username == loggedUser.username) ?
     (
       <div className='flex items-center gap-4'>
-        <button className='flex items-center gap-2'>
+        <button 
+          className='flex items-center gap-2'
+          onClick={props.actions.deleteReply}
+          >
           <i className='w-4'>
             <img src="../../images/icon-delete.svg" 
               width="100%" height="auto" />

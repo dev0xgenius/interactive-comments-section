@@ -8,6 +8,26 @@ import { generateID } from '../../utils/helpers'
 
 export default function App() {
   const [appData, setAppData] = useState();
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    handleResponse: null
+  });
+  
+  const showModal = () => {
+    return new Promise(resolve => {
+      setModalState(s => ({
+        isOpen: true,
+        handleResponse: resolve,
+      }));
+    });
+  };
+  
+  const closeModal = () => {
+    setModalState(s => ({
+      isOpen: false,
+      handleResponse: null
+    }));
+  };
   
   useEffect(() => {
     const controller = new AbortController();
@@ -53,12 +73,23 @@ export default function App() {
     )); client.addReply(reply, commentID);
   };
   
-  const deleteReply = () => {
-    
+  const deleteReply = async (replyID) => {
+    let userSelection = await showModal();
+    if (userSelection) {
+      closeModal();
+      let updatedComments = appData.comments.filter(comment => {
+        if (comment.replies.length != 0)
+          comment.replies = comment.replies.filter(reply => reply.id != replyID);
+        return (comment.id != replyID);
+      });
+      
+      setAppData(currentData => ({...currentData, comments: updatedComments}));
+      client.deleteReply(replyID);
+    } else closeModal();
   };
   
   const editReply = () => {}
-  const getModalRes = () => {}
+  
 
   return (appData != null) ? (
     <UserContext.Provider value={appData.currentUser}>
@@ -66,8 +97,8 @@ export default function App() {
         mainMsg="Are you sure you want to remove this comment?
         This will remove the comment and can't be undone"
         headerMsg="Delete Comment"
-        isOpen={false}
-        getModalRes={getModalRes}
+        isOpen={modalState.isOpen}
+        handleResponse={modalState.handleResponse}
       />
       <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
         <Comments 

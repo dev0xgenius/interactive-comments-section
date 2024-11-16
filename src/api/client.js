@@ -45,11 +45,20 @@ function addReply(reply, commentID) {
     headers: {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify(reply),
-  }).catch(err => console.error("Fucking hell mate!!!"));
+  }).catch(err => console.error("Couldn't add reply"));
+}
+
+function deleteReply(replyID) {
+  fetch("api/comments/delete", {
+    headers: {"Content-Type" : "application/json"},
+    method: "DELETE",
+    body: replyID
+  }).catch(err => console.error("Couldn't complete the operation"));
 }
 
 export default {
   getComments,
   addComment,
-  addReply
+  addReply,
+  deleteReply
 };

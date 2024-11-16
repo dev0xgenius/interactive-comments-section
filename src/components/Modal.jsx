@@ -15,14 +15,14 @@ export default function Modal(props) {
 					<footer className="w-full">
 						<div className="container w-full flex gap-4">
 							<button
-							  onClick={() => props.getModalRes(false)}
+							  onClick={() => props.handleResponse(false)}
 								className="bg-blue-600 text-white-100
                 rounded-md px-5 py-2.5 font-semibold"
 							>
 								NO, CANCEL
 							</button>
 							<button
-							  onClick={() => props.getModalRes(true)}
+							  onClick={() => props.handleResponse(true)}
 								className="bg-red-100 text-white-100
                 rounded-md px-5 py-2.5 font-semibold"
 							>

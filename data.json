@@ -19,50 +19,7 @@
         },
         "username": "amyrobson"
       },
-      "replies": [
-        {
-          "id": 1731664892,
-          "content": "God whem",
-          "createdAt": "Now",
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        },
-        {
-          "id": 1731665092,
-          "content": "2TF?",
-          "createdAt": "Now",
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        },
-        {
-          "id": 1731665105,
-          "content": "What>>>",
-          "createdAt": "Now",
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        }
-      ]
+      "replies": []
     },
     {
       "id": 2,
@@ -90,36 +47,8 @@
             },
             "username": "ramsesmiron"
           }
-        },
-        {
-          "id": 4,
-          "content": "I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
-          "createdAt": "2 days ago",
-          "score": 2,
-          "replyingTo": "ramsesmiron",
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          }
         }
       ]
-    },
-    {
-      "id": 1731663715,
-      "content": "What inspired the project? I'd love to know. It looks like an artwork where you're trying to say sum'n. ",
-      "score": 0,
-      "createdAt": "Now",
-      "user": {
-        "image": {
-          "png": "./images/avatars/image-juliusomo.png",
-          "webp": "./images/avatars/image-juliusomo.webp"
-        },
-        "username": "juliusomo"
-      },
-      "replies": []
     }
   ]
 }

@@ -27,6 +27,8 @@ export default function Comment(props) {
     props.actions.addReply(newReply, props.commentID || props.id);
   };
   
+  const deleteReply = () => props.actions.deleteReply(props.id);
+  
   return (
     <div className='flex flex-col gap-4'>
       <div className="comment rounded-2xl p-5 bg-white-100 h-max">
@@ -46,6 +48,7 @@ export default function Comment(props) {
               <UserOptions 
                 user={props.user}
                 toggleForm={toggleForm}
+                actions={{deleteReply}}
               />
             </div>
           </footer>
