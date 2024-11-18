@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5173;
 let server = {
   version: 0,
   waiting: [],
+  cachedData: {}
 };
 
 server.waitForChanges = function(time) {
@@ -27,7 +28,7 @@ server.waitForChanges = function(time) {
 
 server.updated = function() {
   server.version += 1;
-  getJSON(FILEPATH)
+  getData()
     .then(data => {
       let response = {
         body: JSON.stringify(data),
@@ -42,26 +43,27 @@ server.updated = function() {
     });
     
   server.waiting = [];
+  setTimeout(() => saveToDisk(server.cachedData), 500);
 };
 
-function getJSON(jsonFile) {
-  return new Promise((resolve, reject) => {
-    try { 
-      const readStream = fs.createReadStream(jsonFile);
-      
-      let streamOutput = null;
-      readStream.on("data", dataChunk => 
-      streamOutput = dataChunk.toString());
-        
-      readStream.on('end', (err) => {
-        if (err) reject("Something bad occured...");
-          
-        streamOutput = JSON.parse(streamOutput);
-        if (streamOutput != null) resolve(streamOutput);
-        else reject("Couldn't parse file...");
-      });
-    } catch(e) { console.error(e); }
-  });
+server.loadInitialData = filePath => {
+  let outputBuffer = [];
+  const readStream = fs.createReadStream(filePath);
+  readStream.on("data", dataChunk => outputBuffer.push(dataChunk));
+  readStream.on("end", () => 
+    server.cachedData = JSON.parse(outputBuffer.toString())
+  );
+};
+
+function getData() { return Promise.resolve(server.cachedData); }
+
+async function saveToDisk(data) {
+  try {
+    await fsPromises.writeFile(
+      FILEPATH,
+      JSON.stringify(data, null, 2)
+    );
+  } catch (e) { console.log(e); }
 }
 
 app.get("/api/comments", (req, res) => {
@@ -69,7 +71,7 @@ app.get("/api/comments", (req, res) => {
   let wait = /\bwait=(\d+)/.exec(req.headers.Prefer);
   
   if (!tag || Number(tag[1]) != server.version) {
-    getJSON(FILEPATH).then(data => {
+    getData().then(data => {
       res.writeHead(200, {
         "Content-Type" : "application/json",
         "ETag" : `"${server.version}"`,
@@ -91,22 +93,15 @@ app.get("/api/comments", (req, res) => {
 
 app.put("/api/comments/add", (req, res) => {
   let newComment = null;
-  req.on("data", dataChunk => {
-    newComment = JSON.parse(dataChunk.toString());
-    
+  req.on("data", dataChunk => newComment = JSON.parse(dataChunk.toString()));
+  req.on("end", () => {
     if (newComment != null) {
-      getJSON(FILEPATH).then(data => {
-        res.status(200);
+      getData().then(data => {
         let updatedComments = [...data.comments, newComment];
-        let updatedData = {...data, comments: updatedComments};
-        
-        fsPromises.writeFile(
-          FILEPATH,
-          JSON.stringify(updatedData, null, 2)
-        ).catch(err => console.log(`Fatal Error: ${err}`));
-        
-        server.updated();
-      }).catch(err => console.log(err));
+        server.cachedData = {...data, comments: updatedComments};
+        server.updated(); 
+        res.status(200).end();
+      });
     }
   });
 });
@@ -116,8 +111,7 @@ app.post("/api/comments/add/reply", (req, res) => {
   req.on("data", dataChunk => newReply = JSON.parse(dataChunk.toString()));
   req.on('end', () => {
     if (newReply != null) {
-      getJSON(FILEPATH).then(data => {
-        res.status(200);
+      getData().then(data => {
         let updatedComments = data.comments.map(comment => {
           if (comment.id === newReply.commentID) {
             delete newReply.commentID;
@@ -127,15 +121,12 @@ app.post("/api/comments/add/reply", (req, res) => {
             ); 
           }
           return comment;
-        }); let updatedData = {...data, comments: updatedComments};
+        }); 
         
-        fsPromises.writeFile(
-          FILEPATH,
-          JSON.stringify(updatedData, null, 2)
-        ).catch(err => console.log(`Fatal Error: ${err}`));
-        
+        server.cachedData = {...data, comments: updatedComments};
         server.updated();
-      }).catch(err => console.log(err));
+        res.status(200).end();
+      });
     }
   });
 });
@@ -144,21 +135,18 @@ app.delete("/api/comments/delete", (req, res) => {
   let replyID = NaN;
   req.on('data', data => replyID = Number(data.toString()));
   req.on('end', () => {
-    getJSON(FILEPATH).then(data => {
+    getData().then(data => {
       let updatedComments = data.comments.filter(comment => {
         if (comment.replies.length != 0)
           comment.replies = comment.replies.filter(reply => reply.id != replyID);
         return (comment.id != replyID);
-      }); let updatedData = {...data, comments: updatedComments};
+      }); 
       
-      fsPromises.writeFile(
-        FILEPATH,
-        JSON.stringify(updatedData, null, 2)
-      ).catch(err => console.log(`Fatal Error: ${err}`));
-      
+      server.cachedData = {...data, comments: updatedComments};
       server.updated();
-    }).catch(err => console.error(err));
+    });
   });
 });
 
+server.loadInitialData(FILEPATH);
 ViteExpress.listen(app, PORT, () => console.log(`Server running on ${PORT}`));

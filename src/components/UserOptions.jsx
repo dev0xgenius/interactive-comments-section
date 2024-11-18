@@ -17,7 +17,10 @@ export default function UserOptions(props) {
           </i>
           <span className='font-semibold text-red-100'>Delete</span>
         </button>
-        <button className='flex items-center gap-2'>
+        <button 
+          className='flex items-center gap-2'
+          onClick={props.actions.editReply}
+          >
           <i className='w-4'>
             <img src="../../images/icon-edit.svg" 
               width="100%" height="auto" />

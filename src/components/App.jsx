@@ -88,7 +88,9 @@ export default function App() {
     } else closeModal();
   };
   
-  const editReply = () => {}
+  const editReply = (editedReply, id) => {
+    alert("Your comment has been edited!");
+  };
   
 
   return (appData != null) ? (

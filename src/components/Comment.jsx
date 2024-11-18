@@ -3,15 +3,27 @@ import ReplyForm from './ReplyForm'
 import UserOptions from './UserOptions'
 import UserTag from './UserTag'
 import PropTypes from 'prop-types'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { generateID } from '../../utils/helpers.js'
 import { UserContext } from '../../utils/contexts/UserContext'
 
 export default function Comment(props) {
-  const [formOpen, setFormOpen] = useState(false);
+  const [formState, setFormState] = useState({
+    isOpen: false,
+    action: null,
+    placeholder: "",
+    content: ""
+  });
   const loggedUser = useContext(UserContext);
   
-  const toggleForm = () => setFormOpen(currentState => !currentState);
+  const openForm = () => setFormState(fs => ({...fs, isOpen: true}));
+  const closeForm = () => setFormState(fs => ({...fs, isOpen: false}));
+  
+  
+  const toggleForm = () => {
+    let formOpen = formState.isOpen;
+    (formOpen) ? closeForm() : openForm();
+  }
   
   const addReply = (replyText) => {
     const newReply = {
@@ -23,11 +35,33 @@ export default function Comment(props) {
       replyingTo: props.user.username
     };
     
-    toggleForm();
+    closeForm();
     props.actions.addReply(newReply, props.commentID || props.id);
   };
   
   const deleteReply = () => props.actions.deleteReply(props.id);
+  
+  const handleEditedReply = (editedReply) => {
+    closeForm();
+    props.actions.editReply(editedReply, props.id);
+  };
+  
+  const editReply = () => {
+    setFormState(fs => (
+      {
+        ...fs,
+        action: handleEditedReply,
+        placeholder: "Edit...",
+        content: props.content
+      }
+    ));
+    
+    toggleForm();
+  };
+  
+  useEffect(() => {
+    setFormState(fs => ({...fs, action: addReply}));
+  }, []);
   
   return (
     <div className='flex flex-col gap-4'>
@@ -48,15 +82,18 @@ export default function Comment(props) {
               <UserOptions 
                 user={props.user}
                 toggleForm={toggleForm}
-                actions={{deleteReply}}
+                actions={{deleteReply, editReply}}
               />
             </div>
           </footer>
         </div>
       </div>
       <ReplyForm
-        keepOpen={formOpen}
-        action={addReply}
+        keepOpen={formState.isOpen}
+        action={formState.action}
+        content={formState.content}
+        placeholder={formState.placeholder}
+        toggleForm={props.toggleForm}
       />
     </div>
   );

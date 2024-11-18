@@ -23,8 +23,7 @@ export default function ReplyForm(props) {
           name='content' 
           className='rounded-xl w-full border px-5 py-2.5 resize-none h-20'
           placeholder={props.placeholder || "Reply..."}
-        >
-        </textarea>
+        >{props.content}</textarea>
         <span className='flex justify-between items-center'>
           <span className='inline-block w-8'>
             <img src={user.image.png} width='100%' height='auto' />
@@ -42,7 +41,8 @@ export default function ReplyForm(props) {
 };
 
 ReplyForm.propTypes = {
-  action: PropTypes.func,
+  content: PropTypes.string,
+  action: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   keepOpen: PropTypes.bool.isRequired
 };
