@@ -89,7 +89,24 @@ export default function App() {
   };
   
   const editReply = (editedReply, id) => {
-    alert("Your comment has been edited!");
+    let { comments } = appData;
+    let updatedComments = comments.map(comment => {
+      if (comment.id === id) return {...comment, content: editedReply}
+      else if (comment.id !== id && !comment.replies) return comment; 
+      else if (comment.replies) {
+        let { replies } = comment;
+        replies = replies.map(reply => {
+          if (reply.id === id) return {...reply, content: editedReply};
+          else return reply;
+        });
+        
+        return {...comment, replies: replies};
+      }
+    });
+    
+    setAppData(currentData => (
+      {...currentData, comments: updatedComments}
+    ));
   };
   
 

@@ -1,6 +1,5 @@
 const generateID = (objArray, usedIDs = new Set([])) => {
   let newID = null; let idExists = false;
-  
   do {
     newID = Math.floor(Date.now() / 1000);
   } while (usedIDs.has(newID));

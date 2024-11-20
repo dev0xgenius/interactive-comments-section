@@ -19,11 +19,10 @@ export default function Comment(props) {
   const openForm = () => setFormState(fs => ({...fs, isOpen: true}));
   const closeForm = () => setFormState(fs => ({...fs, isOpen: false}));
   
-  
   const toggleForm = () => {
     let formOpen = formState.isOpen;
     (formOpen) ? closeForm() : openForm();
-  }
+  };
   
   const addReply = (replyText) => {
     const newReply = {
@@ -47,12 +46,15 @@ export default function Comment(props) {
   };
   
   const editReply = () => {
+    let content = (typeof props.content == 'object') ?
+      props.content.props.children[1] : props.content;
+      
     setFormState(fs => (
       {
         ...fs,
         action: handleEditedReply,
-        placeholder: "Edit...",
-        content: props.content
+        placeholder: "Edit Your Comment...",
+        content: content
       }
     ));
     
@@ -60,7 +62,11 @@ export default function Comment(props) {
   };
   
   useEffect(() => {
-    setFormState(fs => ({...fs, action: addReply}));
+    setFormState(fs => ({
+        ...fs,
+        action: addReply
+      }
+    ));
   }, []);
   
   return (
@@ -104,6 +110,9 @@ Comment.propTypes = {
   content: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
+  
+  replyingTo: PropTypes.string, // For Comment as Reply
+  commentID: PropTypes.number, // For Comment as Reply
   
   replies: PropTypes.arrayOf(
     PropTypes.shape({

@@ -18,9 +18,10 @@ export default function Comments(props) {
           actions={props.actions}
         />
         <Replies 
-          data={comment.replies}
+          replies={comment.replies}
           commentID={comment.id}
           actions={props.actions}
+          targetUser={comment.user.username}
         />
       </li>
     );

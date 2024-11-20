@@ -19,22 +19,7 @@
         },
         "username": "amyrobson"
       },
-      "replies": [
-        {
-          "id": 1731969548,
-          "content": "God when",
-          "createdAt": "Now",
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        }
-      ]
+      "replies": []
     },
     {
       "id": 2,
@@ -76,6 +61,20 @@
             },
             "username": "juliusomo"
           }
+        },
+        {
+          "id": 1732128343,
+          "content": "I literally hate you",
+          "createdAt": "Now",
+          "score": 0,
+          "user": {
+            "image": {
+              "png": "./images/avatars/image-juliusomo.png",
+              "webp": "./images/avatars/image-juliusomo.webp"
+            },
+            "username": "juliusomo"
+          },
+          "replyingTo": "ramsesmiron"
         }
       ]
     }

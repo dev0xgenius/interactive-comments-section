@@ -1,19 +1,26 @@
 import PropTypes from 'prop-types'
 import Comment from './Comment'
 
-export default function Replies({data, commentID, actions}) {
-  return (data.length == 0) ?
+export default function Replies({replies, commentID, actions}) {
+  let contentJSX = (replyingTo, replyText) => 
+    <>
+      <span className="author text-blue-300">{`@${replyingTo}, `}</span>
+      {`${replyText}`}
+    </>;
+    
+  return (replies.length == 0) ?
     <></> : (
     <ul className='border-l-2 pl-5 flex flex-col gap-4 py-4'>
       {
-        data.map(reply => {
+        replies.map(reply => {
           return <li key={reply.id}>
             <Comment
               id={reply.id}
-              content={`@${reply.replyingTo}, ${reply.content}`}
+              content={contentJSX(reply.replyingTo, reply.content)}
               createdAt={reply.createdAt}
               score={reply.score}
               user={reply.user}
+              replyingTo={reply.replyingTo}
               
               commentID={commentID}
               actions={actions}
@@ -26,7 +33,12 @@ export default function Replies({data, commentID, actions}) {
 }
 
 Replies.propTypes = {
-  handleReply: PropTypes.func,
+  actions: PropTypes.arrayOf(PropTypes.shape({
+    addReply: PropTypes.func,
+    deleteReply: PropTypes.func,
+    editReply: PropTypes.func
+  })),
+  
   commentID: PropTypes.number.isRequired,
   
   data: PropTypes.arrayOf(
