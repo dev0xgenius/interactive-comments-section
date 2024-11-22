@@ -3,7 +3,7 @@ import Comment from './Comment'
 import Replies from './Replies.jsx'
 
 export default function Comments(props) {
-  let comments = props.data;
+  let comments = props.data.sort((a, b) => b.score - a.score);
   comments = comments.map(comment => {
     return (
       <li key={comment.id}>

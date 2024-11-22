@@ -30,6 +30,7 @@ export default function Comment(props) {
 
   const addReply = (replyText) => {
     replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "");
+    
     const newReply = {
       id: Math.floor(Date.now() / 1000),
       content: replyText,
@@ -83,20 +84,25 @@ export default function Comment(props) {
   return (
     <div className='flex flex-col gap-4'>
       <div className="comment rounded-2xl p-5 bg-white-100 h-max">
-        <div className="container grid gap-4 h-max">
-          <header>
-            <div className="comment-info flex gap-4 items-center">
-              <UserTag user={props.user} />
-              <span className='text-blue-500'>
-                {elapsedString(new Date(props.createdAt))}
-              </span>
-            </div>
-          </header>
-          <main>
-            <p className='text-blue-500'>{props.content}</p>
-          </main>
-          <footer>
-            <div className="comment-actions w-full flex justify-between">
+        <div className="container grid gap-4 h-max
+          sm:grid-cols-12 sm:grid-rows-1"
+        >
+        <div className="content sm:col-start-2 sm:col-span-full 
+            flex flex-col gap-4 sm:row-start-1 sm:pl-5">
+            <header className="">
+              <div className="comment-info flex gap-4 items-center">
+                <UserTag user={props.user} />
+                <span className='text-blue-500'>
+                  {elapsedString(new Date(props.createdAt))}
+                </span>
+              </div>
+            </header>
+            <main className="">
+              <p className='text-blue-500'>{props.content}</p>
+            </main>
+          </div>
+          <footer className="sm:col-start-1 sm:col-span-full sm:row-start-1">
+            <div className="comment-actions w-full flex justify-between sm:items-start">
               <Counter
                 count={props.score}
                 onPlusClick={upVote}

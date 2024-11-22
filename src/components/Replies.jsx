@@ -7,12 +7,13 @@ export default function Replies({replies, commentID, actions}) {
       <span className="author text-blue-300">{`@${replyingTo}, `}</span>
       {`${replyText}`}
     </>;
-    
+  
+  let sortedReplies = replies.sort((a, b) => a.createdAt - b.createdAt);
   return (replies.length == 0) ?
     <></> : (
     <ul className='border-l-2 pl-5 flex flex-col gap-4 py-4'>
       {
-        replies.map(reply => {
+        sortedReplies.map(reply => {
           return <li key={reply.id}>
             <Comment
               id={reply.id}

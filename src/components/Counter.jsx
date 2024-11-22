@@ -5,7 +5,10 @@ import minusIcon from '../../images/icon-minus.svg'
 
 export default function Counter({count, onMinusClick, onPlusClick}) {
   return (
-    <div className='rounded-xl flex gap-2 p-2.5 bg-white-80 w-32 justify-around items-center'>
+    <div className='rounded-xl flex gap-2 p-2.5 bg-white-80 
+        w-32 justify-around items-center sm:flex-col 
+        sm:w-1/12 sm:h-32 sm:self-center'
+      >
       <button
         className='inline-block w-4'
         onClick={onPlusClick}

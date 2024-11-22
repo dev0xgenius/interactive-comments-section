@@ -21,9 +21,23 @@
       },
       "replies": [
         {
-          "id": 1732298041,
-          "content": " How are you doing??",
-          "createdAt": 1732298041059,
+          "id": 1732310299,
+          "content": " How old are you??",
+          "createdAt": 1732310299495,
+          "score": 0,
+          "user": {
+            "image": {
+              "png": "./images/avatars/image-juliusomo.png",
+              "webp": "./images/avatars/image-juliusomo.webp"
+            },
+            "username": "juliusomo"
+          },
+          "replyingTo": "amyrobson"
+        },
+        {
+          "id": 1732310534,
+          "content": " wad up??",
+          "createdAt": 1732310534943,
           "score": 0,
           "user": {
             "image": {
@@ -76,42 +90,14 @@
             },
             "username": "juliusomo"
           }
-        },
-        {
-          "id": 1732298472,
-          "content": " Mumu!!",
-          "createdAt": 1732298472576,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "ramsesmiron"
         }
       ]
     },
     {
-      "id": 1732298527,
-      "content": "God when!!",
+      "id": 1732304721,
+      "content": "Good morning guys!!!",
       "score": 0,
-      "createdAt": 1732298527866,
-      "user": {
-        "image": {
-          "png": "./images/avatars/image-juliusomo.png",
-          "webp": "./images/avatars/image-juliusomo.webp"
-        },
-        "username": "juliusomo"
-      },
-      "replies": []
-    },
-    {
-      "id": 1732298557,
-      "content": "Yowa!!",
-      "score": 0,
-      "createdAt": 1732298557317,
+      "createdAt": 1732304721482,
       "user": {
         "image": {
           "png": "./images/avatars/image-juliusomo.png",
