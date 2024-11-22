@@ -16,7 +16,7 @@ export default function Modal(props) {
 						<div className="container w-full flex gap-4">
 							<button
 							  onClick={() => props.handleResponse(false)}
-								className="bg-blue-600 text-white-100
+								className="bg-blue-500 text-white-100
                 rounded-md px-5 py-2.5 font-semibold"
 							>
 								NO, CANCEL

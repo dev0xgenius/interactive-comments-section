@@ -5,6 +5,7 @@ import { useEffect, useState, useContext } from 'react';
 import client from '../api/client';
 import { UserContext } from "../../utils/contexts/UserContext";
 import { generateID } from '../../utils/helpers'
+import { elapsedString } from '../../utils/time'; 
 
 export default function App() {
   const [appData, setAppData] = useState();
@@ -12,7 +13,7 @@ export default function App() {
     isOpen: false,
     handleResponse: null
   });
-  
+
   const showModal = () => {
     return new Promise(resolve => {
       setModalState(s => ({
@@ -21,20 +22,20 @@ export default function App() {
       }));
     });
   };
-  
+
   const closeModal = () => {
     setModalState(s => ({
       isOpen: false,
       handleResponse: null
     }));
   };
-  
+
   useEffect(() => {
     const controller = new AbortController();
     client.getComments(
-      data => setAppData(currentState => ({...data}))
-    , controller);
-    
+      data => setAppData(currentState => ({ ...data }))
+      , controller);
+
     return () => {
       controller.abort();
     }
@@ -45,7 +46,7 @@ export default function App() {
       id: generateID(appData.comments),
       content: comment,
       score: 0,
-      createdAt: "Now",
+      createdAt: Date.now(),
       user: appData.currentUser,
       replies: []
     };
@@ -56,23 +57,23 @@ export default function App() {
         {}, currentState, { comments: updatedComments })
     ); client.addComment(newComment);
   };
-  
+
   const addReply = (reply, commentID) => {
     let updatedComments = appData.comments.map(comment => {
       if (comment.id === commentID) {
         let updatedReplies = comment.replies.concat(reply);
-        return Object.assign({}, comment, 
+        return Object.assign({}, comment,
           { replies: updatedReplies }
-        ); 
+        );
       }
       return comment;
     });
-    
+
     setAppData(currentState => Object.assign(
       {}, currentState, { comments: updatedComments }
     )); client.addReply(reply, commentID);
   };
-  
+
   const deleteReply = async (replyID) => {
     let userSelection = await showModal();
     if (userSelection) {
@@ -82,33 +83,58 @@ export default function App() {
           comment.replies = comment.replies.filter(reply => reply.id != replyID);
         return (comment.id != replyID);
       });
-      
-      setAppData(currentData => ({...currentData, comments: updatedComments}));
+
+      setAppData(currentData => ({ ...currentData, comments: updatedComments }));
       client.deleteReply(replyID);
     } else closeModal();
   };
-  
+
   const editReply = (editedReply, id) => {
     let { comments } = appData;
     let updatedComments = comments.map(comment => {
-      if (comment.id === id) return {...comment, content: editedReply}
-      else if (comment.id !== id && !comment.replies) return comment; 
+      if (comment.id === id) return { ...comment, content: editedReply }
+      else if (comment.id !== id && !comment.replies) return comment;
       else if (comment.replies) {
         let { replies } = comment;
         replies = replies.map(reply => {
-          if (reply.id === id) return {...reply, content: editedReply};
+          if (reply.id === id) return { ...reply, content: editedReply };
           else return reply;
         });
-        
-        return {...comment, replies: replies};
+
+        return { ...comment, replies: replies };
       }
     });
-    
+
     setAppData(currentData => (
-      {...currentData, comments: updatedComments}
+      { ...currentData, comments: updatedComments }
     ));
   };
-  
+
+  const vote = (count, id) => {
+    const { comments } = appData;
+    const counter = (count, oldVal) =>
+      (oldVal || count > 0) ? (oldVal + (count)) : oldVal;
+
+    let updatedComments = comments.map(comment => {
+      let newScore = 0, oldScore = comment.score;
+      if (comment.id === id) return { ...comment, score: counter(count, oldScore) };
+      else if (comment.replies && comment.id !== id ) {
+        let { replies } = comment;
+        replies = replies.map(reply => {
+          oldScore = reply.score;
+          return (reply.id === id) ? 
+            { ...reply, score: counter(count, oldScore) } : reply;
+        });
+        
+        return { ...comment, replies: replies }
+      }
+    });
+
+    setAppData(currentData => ({
+      ...currentData,
+      comments: updatedComments
+    }));
+  };
 
   return (appData != null) ? (
     <UserContext.Provider value={appData.currentUser}>
@@ -120,9 +146,9 @@ export default function App() {
         handleResponse={modalState.handleResponse}
       />
       <div className="wrapper max-w-sm m-auto flex flex-col gap-0">
-        <Comments 
+        <Comments
           data={appData.comments}
-          actions={{addReply, deleteReply, editReply}}
+          actions={{ addReply, deleteReply, editReply, vote }}
         />
         <ReplyForm
           keepOpen={true}

@@ -22,7 +22,7 @@ export default function ReplyForm(props) {
       <div className='grid gap-4'>
         <textarea
           name='content' 
-          className='rounded-xl w-full border px-5 py-2.5 resize-none h-24'
+          className='rounded-xl w-full border px-5 py-2.5 resize-none h-32'
           placeholder={props.placeholder || "Reply..."}
         >{props.content}</textarea>
         <span className='flex justify-between items-center'>
@@ -33,7 +33,7 @@ export default function ReplyForm(props) {
             type='submit'
             className='rounded-xl bg-blue-300 w-32 font-bold text-white-100 p-4'
           >
-            SEND
+            {props.actionText || 'SEND'}
           </button>
         </span>
       </div>
@@ -42,6 +42,7 @@ export default function ReplyForm(props) {
 };
 
 ReplyForm.propTypes = {
+  actionText: PropTypes.string,
   content: PropTypes.string,
   action: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
