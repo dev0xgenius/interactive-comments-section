@@ -11,7 +11,7 @@ export default function Replies({replies, commentID, actions}) {
   let sortedReplies = replies.sort((a, b) => a.createdAt - b.createdAt);
   return (replies.length == 0) ?
     <></> : (
-    <ul className='border-l-2 pl-5 flex flex-col gap-4 py-4'>
+    <ul className='border-l-2 pl-5 flex flex-col gap-4 py-5'>
       {
         sortedReplies.map(reply => {
           return <li key={reply.id}>

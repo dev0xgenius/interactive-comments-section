@@ -10,12 +10,14 @@ import { elapsedString } from '../../utils/time'
 
 export default function Comment(props) {
   const loggedUser = useContext(UserContext);
+  const [editForm, setEditForm] = useState(false);
   const [formState, setFormState] = useState({
     isOpen: false,
     action: null,
     actionText: "",
     placeholder: "",
-    content: ""
+    content: "",
+    user: {}
   });
 
   const upVote = () => props.actions.vote(1, props.id);
@@ -27,6 +29,8 @@ export default function Comment(props) {
     let formOpen = formState.isOpen;
     (formOpen) ? closeForm() : openForm();
   };
+  
+  const toggleEditForm = () => setEditForm(bool => !bool);
 
   const addReply = (replyText) => {
     replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "");
@@ -48,7 +52,7 @@ export default function Comment(props) {
   const deleteReply = () => props.actions.deleteReply(props.id);
 
   const handleEditedReply = (editedReply) => {
-    closeForm();
+    toggleEditForm();
     editedReply = editedReply.replace(/(^@[0-9a-z]+,?)/, "");
     if(editedReply.trim()) 
       props.actions.editReply(editedReply, props.id);
@@ -57,23 +61,28 @@ export default function Comment(props) {
   const editReply = () => {
     let content = (typeof props.content == 'object') ?
       props.content.props.children[1] : props.content;
-
+      
+    if (props.replyingTo) content = `@${props.replyingTo}, ${content}`;
+    
     setFormState(fs => (
       {
         ...fs,
+        isOpen: !editForm,
         actionText: "UPDATE",
         action: handleEditedReply,
         placeholder: "Edit Your Comment...",
-        content: `@${props.replyingTo}, ` + content
+        content: content,
+        user: {...loggedUser, image: ""}
       }
     ));
-
-    toggleForm();
+    
+    toggleEditForm();
   };
-
+  
   useEffect(() => {
     setFormState(fs => ({
       ...fs,
+      user: loggedUser,
       content: `@${props.user.username}, `,
       action: addReply,
       actionText: "REPLY"
@@ -89,7 +98,7 @@ export default function Comment(props) {
         >
         <div className="content sm:col-start-2 sm:col-span-full 
             flex flex-col gap-4 sm:row-start-1 sm:pl-5">
-            <header className="">
+            <header>
               <div className="comment-info flex gap-4 items-center">
                 <UserTag user={props.user} />
                 <span className='text-blue-500'>
@@ -97,8 +106,18 @@ export default function Comment(props) {
                 </span>
               </div>
             </header>
-            <main className="">
-              <p className='text-blue-500'>{props.content}</p>
+            <main>
+              {
+                (editForm) ?
+                  <ReplyForm
+                    keepOpen={formState.isOpen}
+                    action={formState.action}
+                    content={formState.content}
+                    placeholder={formState.placeholder}
+                    actionText={formState.actionText}
+                    user={formState.user}
+                  /> : <p className="text-blue-500">{props.content}</p>
+              }
             </main>
           </div>
           <footer className="sm:col-start-1 sm:col-span-full sm:row-start-1">
@@ -117,14 +136,25 @@ export default function Comment(props) {
           </footer>
         </div>
       </div>
-      <ReplyForm
-        keepOpen={formState.isOpen}
-        action={formState.action}
-        content={formState.content}
-        placeholder={formState.placeholder}
-        actionText={formState.actionText}
-        // toggleForm={props.toggleForm}
-      />
+      {
+        (loggedUser.username === props.user.username) ?
+        <></> :
+        <div 
+           className={
+             (formState.isOpen) ? 
+              "reply-form bg-white-100 rounded-2xl p-5 w-full" : "hidden"
+           }
+        >
+          <ReplyForm
+            keepOpen={formState.isOpen}
+            action={formState.action}
+            content={formState.content}
+            placeholder={formState.placeholder}
+            actionText={formState.actionText}
+            user={formState.user}
+          />
+        </div>
+      }
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import Comments from './Comments'
 import ReplyForm from './ReplyForm'
 import Modal from './Modal'
-import { useEffect, useState, useContext } from 'react';
-import client from '../api/client';
-import { UserContext } from "../../utils/contexts/UserContext";
+import { useEffect, useState, useContext } from 'react'
+import client from '../api/client'
+import { UserContext } from "../../utils/contexts/UserContext"
 import { generateID } from '../../utils/helpers'
-import { elapsedString } from '../../utils/time'; 
+import { elapsedString } from '../../utils/time'
 
 export default function App() {
   const [appData, setAppData] = useState();
@@ -150,11 +150,14 @@ export default function App() {
           data={appData.comments}
           actions={{ addReply, deleteReply, editReply, vote }}
         />
-        <ReplyForm
-          keepOpen={true}
-          placeholder="Add a comment..."
-          action={addComment}
-        />
+        <div className="reply-form bg-white-100 rounded-2xl p-5">
+          <ReplyForm
+            keepOpen={true}
+            placeholder="Add a comment..."
+            user={appData.currentUser}
+            action={addComment}
+          />
+        </div>
       </div>
     </UserContext.Provider>
   ) : (
