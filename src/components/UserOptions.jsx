@@ -8,20 +8,20 @@ export default function UserOptions(props) {
     (
       <div className='flex items-center gap-4'>
         <button 
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 hover:opacity-80'
           onClick={props.actions.deleteReply}
           >
-          <i className='w-4'>
+          <i className='max-w-4 w-full'>
             <img src="../../images/icon-delete.svg" 
               width="100%" height="auto" />
           </i>
           <span className='font-semibold text-red-100'>Delete</span>
         </button>
         <button 
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 hover:opacity-80'
           onClick={props.actions.editReply}
           >
-          <i className='w-4'>
+          <i className='max-w-4 w-full'>
             <img src="../../images/icon-edit.svg" 
               width="100%" height="auto" />
           </i>
@@ -30,10 +30,10 @@ export default function UserOptions(props) {
       </div>
     ) : (
       <button
-        className='flex items-center gap-2'
+        className='flex items-center gap-2 hover:opacity-80'
         onClick={props.toggleForm}
       >
-        <i className='w-4'>
+        <i className='max-w-4 w-full'>
           <img src='../../images/icon-reply.svg'
             width="100%" height="auto" />
         </i>

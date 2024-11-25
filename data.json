@@ -19,22 +19,7 @@
         },
         "username": "amyrobson"
       },
-      "replies": [
-        {
-          "id": 1732527341,
-          "content": " drag feature?? This isn't a car and there was no nailing and breaking, thanks. ",
-          "createdAt": 1732527341701,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        }
-      ]
+      "replies": []
     },
     {
       "id": 2,
@@ -76,64 +61,8 @@
             },
             "username": "juliusomo"
           }
-        },
-        {
-          "id": 1732527076,
-          "content": "35 light years now. I was born 2005. You can dive into react immediately if you want, just don't use javascript. And you can learn react from my official website https://www.reacttomynudes.com",
-          "createdAt": 1732527076522,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "maxblagun"
-        },
-        {
-          "id": 1732527369,
-          "content": " Oversabi, who ask you?",
-          "createdAt": 1732527369483,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "ramsesmiron"
         }
       ]
-    },
-    {
-      "id": 1732526886,
-      "content": "On a scale of one to ten, rate my outfit",
-      "score": 0,
-      "createdAt": 1732526886388,
-      "user": {
-        "image": {
-          "png": "./images/avatars/image-juliusomo.png",
-          "webp": "./images/avatars/image-juliusomo.webp"
-        },
-        "username": "juliusomo"
-      },
-      "replies": []
-    },
-    {
-      "id": 1732557387,
-      "content": "This close",
-      "score": 0,
-      "createdAt": 1732557387810,
-      "user": {
-        "image": {
-          "png": "./images/avatars/image-juliusomo.png",
-          "webp": "./images/avatars/image-juliusomo.webp"
-        },
-        "username": "juliusomo"
-      },
-      "replies": []
     }
   ]
 }

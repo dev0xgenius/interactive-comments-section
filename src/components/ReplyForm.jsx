@@ -18,7 +18,8 @@ export default function ReplyForm(props) {
       <textarea
           name='content'
           className='rounded-xl w-full border px-5 py-2.5 
-          sm:z-10 resize-none h-32'
+          sm:z-10 resize-none h-32 focus:border text-blue-600
+          focus:border-blue-600 focus:border-2 outline-0'
           placeholder={props.placeholder || "Reply..."}
         >{props.content}
       </textarea>
@@ -32,8 +33,8 @@ export default function ReplyForm(props) {
         </span>
         <button
           type='submit'
-          className='rounded-xl bg-blue-300 w-24 font-bold 
-          sm:z-10 text-white-100 p-4'
+          className='rounded-xl bg-blue-300 max-w-24 w-full font-bold 
+          sm:z-10 text-white-100 p-4 hover:opacity-80'
         >
           {props.actionText || 'SEND'}
         </button>

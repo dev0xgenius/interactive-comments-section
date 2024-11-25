@@ -168,23 +168,23 @@ Comment.propTypes = {
   replyingTo: PropTypes.string, // For Comment as Reply
   commentID: PropTypes.number, // For Comment as Reply
 
-  replies: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      content: PropTypes.string.isRequired,
-      createdAt: PropTypes.number.isRequired,
-      score: PropTypes.number.isRequired,
-      replyingTo: PropTypes.string.isRequired,
+  // replies: PropTypes.arrayOf(
+  //   PropTypes.shape({
+  //     id: PropTypes.number.isRequired,
+  //     content: PropTypes.string.isRequired,
+  //     createdAt: PropTypes.number.isRequired,
+  //     score: PropTypes.number.isRequired,
+  //     replyingTo: PropTypes.string.isRequired,
 
-      user: PropTypes.shape({
-        image: {
-          png: PropTypes.string,
-          webp: PropTypes.string
-        },
-        username: PropTypes.string
-      }).isRequired
-    })
-  ),
+  //     user: PropTypes.shape({
+  //       image: {
+  //         png: PropTypes.string,
+  //         webp: PropTypes.string
+  //       },
+  //       username: PropTypes.string
+  //     }).isRequired
+  //   })
+  // ),
 
   user: PropTypes.shape({
     image: {
