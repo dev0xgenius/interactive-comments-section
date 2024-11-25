@@ -93,7 +93,7 @@ export default function Comment(props) {
   return (
     <div className='flex flex-col gap-4'>
       <div className="comment rounded-2xl p-5 bg-white-100 h-max">
-        <div className="container grid gap-4 h-max
+        <div className="flex flex-col sm:grid gap-4 h-max
           sm:grid-cols-12 sm:grid-rows-1"
         >
         <div className="content sm:col-start-2 sm:col-span-full 
@@ -106,7 +106,7 @@ export default function Comment(props) {
                 </span>
               </div>
             </header>
-            <main>
+            <main className="w-full">
               {
                 (editForm) ?
                   <ReplyForm
@@ -116,7 +116,7 @@ export default function Comment(props) {
                     placeholder={formState.placeholder}
                     actionText={formState.actionText}
                     user={formState.user}
-                  /> : <p className="text-blue-500">{props.content}</p>
+                  /> : <p className="text-blue-500 overflow-x-auto">{props.content}</p>
               }
             </main>
           </div>

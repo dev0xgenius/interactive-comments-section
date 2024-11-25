@@ -2,7 +2,7 @@ export default function Modal(props) {
 	return props.isOpen ? (
 		<div
 			className="fixed z-20 flex items-center justify-center
-      h-screen w-screen px-5 modal-bg"
+      h-screen w-screen px-6 modal-bg"
 		>
 			<div className="modal rounded-lg max-w-96 bg-white-100 p-5">
 				<div className="container max-w-max flex flex-col gap-4">

@@ -145,7 +145,7 @@ export default function App() {
         isOpen={modalState.isOpen}
         handleResponse={modalState.handleResponse}
       />
-      <div className="wrapper m-auto max-w-3xl flex flex-col gap-0 px-5 py-2.5">
+      <div className="wrapper m-auto w-full max-w-3xl flex flex-col gap-0 px-5 py-2.5">
         <Comments
           data={appData.comments}
           actions={{ addReply, deleteReply, editReply, vote }}

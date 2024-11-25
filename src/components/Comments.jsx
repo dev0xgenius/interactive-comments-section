@@ -17,12 +17,16 @@ export default function Comments(props) {
           
           actions={props.actions}
         />
-        <Replies 
-          replies={comment.replies}
-          commentID={comment.id}
-          actions={props.actions}
-          targetUser={comment.user.username}
-        />
+        <div className={
+          (comment.replies.length) ? "sm:pl-12 sm:mt-6 my-5" : "hidden"
+        }>
+          <Replies 
+            replies={comment.replies}
+            commentID={comment.id}
+            actions={props.actions}
+            targetUser={comment.user.username}
+          />
+        </div>
       </li>
     );
   })
