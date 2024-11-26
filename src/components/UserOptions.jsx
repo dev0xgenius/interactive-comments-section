@@ -11,7 +11,7 @@ export default function UserOptions(props) {
           className='flex items-center gap-2 hover:opacity-80'
           onClick={props.actions.deleteReply}
           >
-          <i className='max-w-4 w-full'>
+          <i className='max-w-4 w-full min-w-min'>
             <img src="../../images/icon-delete.svg" 
               width="100%" height="auto" />
           </i>

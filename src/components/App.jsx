@@ -4,7 +4,7 @@ import Modal from './Modal'
 import { useEffect, useState, useContext } from 'react'
 import client from '../api/client'
 import { UserContext } from "../../utils/contexts/UserContext"
-import { generateID } from '../../utils/helpers'
+import { generateID, updateComment } from '../../utils/helpers'
 import { elapsedString } from '../../utils/time'
 
 export default function App() {
@@ -79,8 +79,11 @@ export default function App() {
     if (userSelection) {
       closeModal();
       let updatedComments = appData.comments.filter(comment => {
-        if (comment.replies.length != 0)
-          comment.replies = comment.replies.filter(reply => reply.id != replyID);
+        if (comment.replies.length != 0) {
+          comment.replies = comment.replies.filter(
+            reply => reply.id != replyID);
+        }
+            
         return (comment.id != replyID);
       });
 
@@ -91,47 +94,30 @@ export default function App() {
 
   const editReply = (editedReply, id) => {
     let { comments } = appData;
-    let updatedComments = comments.map(comment => {
-      if (comment.id === id) return { ...comment, content: editedReply }
-      else if (comment.id !== id && !comment.replies) return comment;
-      else if (comment.replies) {
-        let { replies } = comment;
-        replies = replies.map(reply => {
-          if (reply.id === id) return { ...reply, content: editedReply };
-          else return reply;
-        });
-
-        return { ...comment, replies: replies };
-      }
-    });
+    let updatedComments = updateComment(comments, id,
+      ["content", editedReply]);
 
     setAppData(currentData => (
       { ...currentData, comments: updatedComments }
-    ));
+    )); client.editComment(id, editedReply);
   };
 
   const vote = (count, id) => {
     const { comments } = appData;
     const counter = (count, oldVal) =>
       (oldVal || count > 0) ? (oldVal + (count)) : oldVal;
-
-    let updatedComments = comments.map(comment => {
-      let newScore = 0, oldScore = comment.score;
-      if (comment.id === id) return { ...comment, score: counter(count, oldScore) };
-      else if (comment.replies && comment.id !== id ) {
-        let { replies } = comment;
-        replies = replies.map(reply => {
-          oldScore = reply.score;
-          return (reply.id === id) ? 
-            { ...reply, score: counter(count, oldScore) } : reply;
-        });
+      
+    let updatedComments = updateComment(comments, id, 
+      ["score", (comment) => { 
+        let newScore = counter(count, comment.score)
+        client.vote(newScore, id);
         
-        return { ...comment, replies: replies }
-      }
-    });
+        return newScore;
+      }]
+    );
 
     setAppData(currentData => ({
-      ...currentData,
+      ...currentData, 
       comments: updatedComments
     }));
   };

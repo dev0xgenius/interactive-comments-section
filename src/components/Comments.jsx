@@ -13,7 +13,7 @@ export default function Comments(props) {
           createdAt={comment.createdAt}
           score={comment.score}
           user={comment.user}
-         // replies={comment.replies}
+          replies={comment.replies}
           
           actions={props.actions}
         />

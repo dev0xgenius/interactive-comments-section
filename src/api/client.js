@@ -41,7 +41,7 @@ function addComment(comment){
 
 function addReply(reply, commentID) {
   reply.commentID = commentID;
-  fetch("/api/comments/add/reply", {
+  fetch("/api/comment/add/reply", {
     headers: {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify(reply),
@@ -56,9 +56,27 @@ function deleteReply(replyID) {
   }).catch(err => console.error("Couldn't complete the operation"));
 }
 
+function editComment(id, edit) {
+  fetch("/api/comment/edit", {
+    headers : {"Content-Type" : "application/json"},
+    method: "POST",
+    body: JSON.stringify({id, edit})
+  }).catch(err => console.error(err));
+}
+
+function vote(newCount, id) {
+  fetch("/api/comment/vote", {
+    headers : {"Content-Type" : "application/json"},
+    method: "POST",
+    body: JSON.stringify({count: newCount, id})
+  }).catch(err => console.log(err)); 
+}
+
 export default {
   getComments,
+  editComment,
+  deleteReply,
   addComment,
   addReply,
-  deleteReply
+  vote
 };

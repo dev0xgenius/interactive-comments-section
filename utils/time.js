@@ -57,15 +57,6 @@ function elapsedString(date) {
     
     for (let unit in timeUnitsInMs){
       let unitValue = convertFromMilliseconds(elapsedTime, unit)[0];
-      switch (unit) {
-        case "min":
-          unit = "minute";
-          break;
-        case "sec":
-          unit = "second";
-          break;
-      }
-      
       if (unitValue) {
         unit = (unitValue > 1) ? (unit + "s") : unit;
         return `${unitValue} ${unit} ago`;

@@ -33,10 +33,10 @@ export default function Comment(props) {
   const toggleEditForm = () => setEditForm(bool => !bool);
 
   const addReply = (replyText) => {
-    replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "");
+    replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "").trim();
     
     const newReply = {
-      id: Math.floor(Date.now() / 1000),
+      id: generateID(props.replies),
       content: replyText,
       createdAt: Date.now(),
       score: 0,
@@ -45,7 +45,7 @@ export default function Comment(props) {
     };
 
     closeForm();
-    if (replyText.trim())
+    if (replyText)
       props.actions.addReply(newReply, props.commentID || props.id);
   };
 
@@ -62,7 +62,7 @@ export default function Comment(props) {
     let content = (typeof props.content == 'object') ?
       props.content.props.children[1] : props.content;
       
-    if (props.replyingTo) content = `@${props.replyingTo}, ${content}`;
+    if (props.replyingTo) content = `@${props.replyingTo}, ${content.trim()}`;
     
     setFormState(fs => (
       {
@@ -168,23 +168,23 @@ Comment.propTypes = {
   replyingTo: PropTypes.string, // For Comment as Reply
   commentID: PropTypes.number, // For Comment as Reply
 
-  // replies: PropTypes.arrayOf(
-  //   PropTypes.shape({
-  //     id: PropTypes.number.isRequired,
-  //     content: PropTypes.string.isRequired,
-  //     createdAt: PropTypes.number.isRequired,
-  //     score: PropTypes.number.isRequired,
-  //     replyingTo: PropTypes.string.isRequired,
+  replies: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      content: PropTypes.string.isRequired,
+      createdAt: PropTypes.number.isRequired,
+      score: PropTypes.number.isRequired,
+      replyingTo: PropTypes.string.isRequired,
 
-  //     user: PropTypes.shape({
-  //       image: {
-  //         png: PropTypes.string,
-  //         webp: PropTypes.string
-  //       },
-  //       username: PropTypes.string
-  //     }).isRequired
-  //   })
-  // ),
+      user: PropTypes.shape({
+        image: {
+          png: PropTypes.string,
+          webp: PropTypes.string
+        },
+        username: PropTypes.string
+      }).isRequired
+    })
+  ),
 
   user: PropTypes.shape({
     image: {

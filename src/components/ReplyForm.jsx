@@ -19,7 +19,7 @@ export default function ReplyForm(props) {
           name='content'
           className='rounded-xl w-full border px-5 py-2.5 
           sm:z-10 resize-none h-32 focus:border text-blue-600
-          focus:border-blue-600 focus:border-2 outline-0'
+          focus:border-blue-300 focus:border-2 outline-0'
           placeholder={props.placeholder || "Reply..."}
         >{props.content}
       </textarea>

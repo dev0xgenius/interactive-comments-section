@@ -15,4 +15,37 @@ const generateID = (objArray, usedIDs = new Set([])) => {
   return (idExists) ? generateID(objArray, usedIDs) : newID;
 };
 
-export { generateID };
+function updateComment(comments, id, [property, value]) {
+  let updatedComments = comments.map(comment => {
+    if (!(property in comment)) return comment;
+    let updatedComment = { ...comment };
+
+    if (comment.id === id) {
+      updatedComment[property] = (typeof value == 'function') ?
+        value(comment) : value;
+    }
+
+    else if (comment.id !== id && !comment.replies) return comment;
+    else if (comment.replies) {
+      let { replies } = comment;
+      replies = replies.map(reply => {
+        let updatedReply = { ...reply };
+        if (reply.id === id) {
+          updatedReply[property] = (typeof value == 'function') ?
+            value(reply) : value;
+        }
+
+        return updatedReply;
+      });
+
+      updatedComment.replies = replies;
+    } return updatedComment;
+  });
+
+  return updatedComments;
+}
+
+export {
+  generateID,
+  updateComment
+};
