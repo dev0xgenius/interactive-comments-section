@@ -1,4 +1,4 @@
-async function getComments(success, controller={signal: null}) {
+async function getComments(success, controller) {
   let tag;
   for (;;) {
     let response;

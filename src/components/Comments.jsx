@@ -39,37 +39,42 @@ export default function Comments(props) {
 };
 
 Comments.propTypes = {
-  handleReply: PropTypes.func.isRequired,
+  actions: PropTypes.shape({
+    handleReply: PropTypes.func,
+    editReply: PropTypes.func,
+    deleteReply: PropTypes.func,
+    vote: PropTypes.func,
+  }).isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       content: PropTypes.string.isRequired,
-      createdAt: PropTypes.string.isRequired,
+      createdAt: PropTypes.number.isRequired,
       score: PropTypes.number.isRequired,
 
       replies: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.number.isRequired,
           content: PropTypes.string.isRequired,
-          createdAt: PropTypes.string.isRequired,
+          createdAt: PropTypes.number.isRequired,
           score: PropTypes.number.isRequired,
           replyingTo: PropTypes.string.isRequired,
           
           user: PropTypes.shape({
-            image: {
+            image: PropTypes.shape({
               png: PropTypes.string,
               webp: PropTypes.string
-            },
+            }),
             username: PropTypes.string
           }).isRequired
         })
       ),
 
       user: PropTypes.shape({
-        image: {
+        image: PropTypes.shape({
           png: PropTypes.string,
           webp: PropTypes.string
-        },
+        }),
         username: PropTypes.string
       }).isRequired
     })

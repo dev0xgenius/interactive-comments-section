@@ -165,8 +165,8 @@ app.post("/api/comment/vote", (req, res) => {
 });
 
 app.delete("/api/comments/delete", (req, res) => {
-  let replyID = NaN;
-  req.on('data', data => replyID = Number(data.toString()));
+  let replyID = 0;
+  req.on('data', dataChunk => replyID = Number(dataChunk.toString()));
   req.on('end', () => {
     getData().then(data => {
       let updatedComments = data.comments.filter(comment => {

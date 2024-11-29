@@ -13,11 +13,11 @@ export default function Comment(props) {
   const [editForm, setEditForm] = useState(false);
   const [formState, setFormState] = useState({
     isOpen: false,
-    action: null,
+    action: () => {},
     actionText: "",
     placeholder: "",
     content: "",
-    user: {}
+    user: {username: ""}
   });
 
   const upVote = () => props.actions.vote(1, props.id);
@@ -79,6 +79,12 @@ export default function Comment(props) {
     toggleEditForm();
   };
   
+  const contentJSX = (replyingTo, replyText) => 
+    <>
+      <span className="author text-blue-300">{`@${replyingTo}, `}</span>
+      {`${replyText}`}
+    </>;
+  
   useEffect(() => {
     setFormState(fs => ({
       ...fs,
@@ -116,7 +122,13 @@ export default function Comment(props) {
                     placeholder={formState.placeholder}
                     actionText={formState.actionText}
                     user={formState.user}
-                  /> : <p className="text-blue-500 overflow-x-auto">{props.content}</p>
+                  /> : 
+                  <p className="text-blue-500 overflow-x-auto">
+                    {
+                      (props.replyingTo) ? 
+                        contentJSX(props.replyingTo,props.content) : props.content
+                    }
+                  </p>
               }
             </main>
           </div>
@@ -177,22 +189,27 @@ Comment.propTypes = {
       replyingTo: PropTypes.string.isRequired,
 
       user: PropTypes.shape({
-        image: {
+        image: PropTypes.shape({
           png: PropTypes.string,
           webp: PropTypes.string
-        },
+        }),
         username: PropTypes.string
       }).isRequired
     })
   ),
 
   user: PropTypes.shape({
-    image: {
+    image: PropTypes.shape({
       png: PropTypes.string,
       webp: PropTypes.string
-    },
+    }),
     username: PropTypes.string
   }).isRequired,
 
-  actions: PropTypes.arrayOf(PropTypes.func)
+  actions: PropTypes.shape({
+    handleReply: PropTypes.func,
+    editReply: PropTypes.func,
+    deleteReply: PropTypes.func,
+    vote: PropTypes.func,
+  }).isRequired,
 };
