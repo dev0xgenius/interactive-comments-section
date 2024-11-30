@@ -5,6 +5,10 @@ import ViteExpress from 'vite-express';
 import { promises as fsPromises } from "fs";
 import { updateComment } from "./utils/helpers.js";
 
+ViteExpress.config({
+  mode:"production"
+});
+
 const app = express();
 
 const FILEPATH = path.join(process.env.PWD, "data.json");
