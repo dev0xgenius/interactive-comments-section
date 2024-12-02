@@ -35,8 +35,6 @@ export default function App() {
     client.getComments(
       data => setAppData(currentState => ({ ...data }))
       , controller);
-      
-    return () => controller.abort();
   }, []);
 
   const addComment = (comment) => {

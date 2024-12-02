@@ -3,15 +3,15 @@ import path from 'path';
 import express from 'express';
 import ViteExpress from 'vite-express';
 import { promises as fsPromises } from "fs";
-import { updateComment } from "./utils/helpers.js";
+import { updateComment } from "../utils/helpers.js";
 
 ViteExpress.config({
-  mode:"production"
+  mode: "production",
 });
 
 const app = express();
 
-const FILEPATH = path.join(process.env.PWD, "data.json");
+const FILEPATH = path.join(process.env.PWD, "server", "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
@@ -170,16 +170,17 @@ app.post("/api/comment/vote", (req, res) => {
 
 app.delete("/api/comments/delete", (req, res) => {
   let replyID = 0;
-  req.on('data', dataChunk => replyID = Number(dataChunk.toString()));
-  req.on('end', () => {
+  req.on('data', dataChunk => replyID += dataChunk.toString());
+  req.on('end', err => {
     getData().then(data => {
-      let updatedComments = data.comments.filter(comment => {
-        if (comment.replies.length != 0) {
+      let updatedComments = data.comments?.filter(comment => {
+        if (comment.replies.length) {
           comment.replies = comment.replies.filter(
-            reply => reply.id != replyID);
+            reply => (reply.id != parseInt(replyID))
+          );
         }
 
-        return (comment.id != replyID);
+        return (comment.id != parseInt(replyID));
       });
 
       server.cachedData = { ...data, comments: updatedComments };
@@ -189,4 +190,4 @@ app.delete("/api/comments/delete", (req, res) => {
 });
 
 server.loadInitialData(FILEPATH);
-ViteExpress.listen(app, PORT, () => console.log(`Server running on ${PORT}`));
+ViteExpress.listen(app, PORT, () => console.log("Server is running. Try catch am!!"));

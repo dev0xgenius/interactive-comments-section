@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Server for dev0xgenius's interactive-comments-section",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dev0xgenius",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "vite-express": "^0.20.0"
+  }
+}

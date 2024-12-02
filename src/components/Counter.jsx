@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-import plusIcon from '../../images/icon-plus.svg'
-import minusIcon from '../../images/icon-minus.svg'
+import plusIcon from '/images/icon-plus.svg'
+import minusIcon from '/images/icon-minus.svg'
 
 export default function Counter({count, onMinusClick, onPlusClick}) {
   return (
