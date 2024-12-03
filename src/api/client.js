@@ -1,4 +1,4 @@
-const BASE_URL = "";//"interactive-comments-section-0xgenius.vercel.app";
+const BASE_URL = "https://interactive-comments-section-0xgenius.vercel.app";
 
 async function getComments(success, controller) {
   let tag;
