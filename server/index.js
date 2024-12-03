@@ -8,6 +8,7 @@ import { updateComment } from "../utils/helpers.js";
 ViteExpress.config({
   mode: "production",
   inlineViteConfig: {
+    base: "/",
     build: { outDir: "../dist" }
   }
 });
