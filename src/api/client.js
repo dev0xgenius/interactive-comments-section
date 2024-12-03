@@ -1,9 +1,11 @@
+const BASE_URL = "https://interactive-comments-section-3yhq2fex2-dev0xgenius-projects.vercel.app";
+
 async function getComments(success, controller) {
   let tag;
   for (;;) {
     let response;
     try {
-      response = await fetch("/api/comments", {
+      response = await fetch(`${BASE_URL}/api/comments`, {
         headers: tag && {
           Accept: "application/json",
           "If-None-Match": tag,
@@ -31,7 +33,7 @@ async function getComments(success, controller) {
 }
 
 function addComment(comment){
-  fetch('/api/comments/add', {
+  fetch(`${BASE_URL}/api/comments/add`, {
     headers: {"Content-Type" : "application/json"},
     method: "PUT",
     body: JSON.stringify(comment),
@@ -41,7 +43,7 @@ function addComment(comment){
 
 function addReply(reply, commentID) {
   reply.commentID = commentID;
-  fetch("/api/comment/add/reply", {
+  fetch(`${BASE_URL}/api/comment/add/reply`, {
     headers: {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify(reply),
@@ -49,7 +51,7 @@ function addReply(reply, commentID) {
 }
 
 function deleteReply(replyID) {
-  fetch("api/comments/delete", {
+  fetch(`${BASE_URL}/api/comments/delete`, {
     headers: {"Content-Type" : "application/json"},
     method: "DELETE",
     body: replyID
@@ -57,7 +59,7 @@ function deleteReply(replyID) {
 }
 
 function editComment(id, edit) {
-  fetch("/api/comment/edit", {
+  fetch(`${BASE_URL}/api/comment/edit`, {
     headers : {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify({id, edit})
@@ -65,7 +67,7 @@ function editComment(id, edit) {
 }
 
 function vote(newCount, id) {
-  fetch("/api/comment/vote", {
+  fetch(`${BASE_URL}/api/comment/vote`, {
     headers : {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify({count: newCount, id})
