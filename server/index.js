@@ -7,6 +7,9 @@ import { updateComment } from "../utils/helpers.js";
 
 ViteExpress.config({
   mode: "production",
+  inlineViteConfig: {
+    build: { outDir: "../dist" }
+  }
 });
 
 const app = express();
