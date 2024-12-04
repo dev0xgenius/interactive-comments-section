@@ -16,7 +16,7 @@ ViteExpress.config({
 const app = express();
 
 console.log(process.cwd());
-const FILEPATH = path.join(process.env.PWD, "server", "data.json");
+const FILEPATH = path.join(process.env.PWD, "server", "api", "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
