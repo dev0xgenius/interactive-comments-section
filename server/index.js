@@ -8,7 +8,7 @@ import { updateComment } from "../utils/helpers.js";
 ViteExpress.config({
   mode: "production",
   inlineViteConfig: {
-    base: path.resolve(__dirname, "server"),
+    base: path.join(process.env.PWD, "server"),
     build: { outDir: "../dist" }
   }
 });
@@ -16,7 +16,7 @@ ViteExpress.config({
 const app = express();
 
 console.log(process.cwd());
-const FILEPATH = path.join(process.env.PWD, "data.json");
+const FILEPATH = path.join(process.env.PWD, "server", "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
