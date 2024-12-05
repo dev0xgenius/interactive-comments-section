@@ -6,6 +6,7 @@
       "dest": "index.js"
     }
   ],
+  
   "functions": {
     "api/*": {
       "includeFiles" : ["data.json"]
