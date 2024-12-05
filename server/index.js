@@ -18,6 +18,8 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+console.log(`${__filename}, ${__dirname}`);
+
 const FILEPATH = path.join(__dirname, "api", "data.json");
 const PORT = process.env.PORT || 5173;
 
