@@ -19,7 +19,10 @@ ViteExpress.config({
 
 const app = express();
 
-console.error(`${__filename}, ${__dirname}`);
+const listFilesWithPath = dir => 
+  fs.readdirSync(dir).map(file => path.join(dir, file));
+
+console.log(listFilesWithPath(path.resolve(__dirname, "../"))); // Replace with your directory path
 
 const FILEPATH = path.join(__dirname, "api", "data.json");
 const PORT = process.env.PORT || 5173;
