@@ -6,19 +6,20 @@ import ViteExpress from 'vite-express';
 import { promises as fsPromises } from "fs";
 import { updateComment } from "../utils/helpers.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 ViteExpress.config({
   mode: "production",
   inlineViteConfig: {
-    base: "./",
+    base: path.resolve(__dirname),
     build: { outDir: "../dist" }
   }
 });
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-console.log(`${__filename}, ${__dirname}`);
+console.error(`${__filename}, ${__dirname}`);
 
 const FILEPATH = path.join(__dirname, "api", "data.json");
 const PORT = process.env.PORT || 5173;
