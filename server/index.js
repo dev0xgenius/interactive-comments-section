@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import express from 'express';
+import { fileURLToPath } from "url";
 import ViteExpress from 'vite-express';
 import { promises as fsPromises } from "fs";
 import { updateComment } from "../utils/helpers.js";
@@ -8,15 +9,16 @@ import { updateComment } from "../utils/helpers.js";
 ViteExpress.config({
   mode: "production",
   inlineViteConfig: {
-    base: path.join(process.env.PWD, "server"),
+    base: "./",
     build: { outDir: "../dist" }
   }
 });
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-console.log(process.cwd());
-const FILEPATH = path.join(process.env.PWD, "server", "api", "data.json");
+const FILEPATH = path.join(__dirname, "api", "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
