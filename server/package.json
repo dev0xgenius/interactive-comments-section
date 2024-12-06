@@ -5,7 +5,7 @@
   "description": "Server for dev0xgenius's interactive-comments-section",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
     "build": "cd ../ && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
