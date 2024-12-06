@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 ViteExpress.config({
   mode: "production",
   inlineViteConfig: {
-    base: path.resolve(__dirname),
+    root: path.resolve(__dirname),
+    base: /,
     build: { outDir: "../dist" }
   }
 });
