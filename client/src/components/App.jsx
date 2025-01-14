@@ -3,9 +3,9 @@ import ReplyForm from './ReplyForm'
 import Modal from './Modal'
 import { useEffect, useState, useContext } from 'react'
 import client from '../api/client'
-import { UserContext } from "../../utils/contexts/UserContext"
-import { generateID, updateComment } from '../../utils/helpers'
-import { elapsedString } from '../../utils/time'
+import { UserContext } from "../utils/contexts/UserContext"
+import { generateID, updateComment } from '../utils/helpers'
+import { elapsedString } from '../utils/time'
 
 export default function App() {
   const [appData, setAppData] = useState();

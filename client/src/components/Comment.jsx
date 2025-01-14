@@ -4,9 +4,9 @@ import UserOptions from './UserOptions'
 import UserTag from './UserTag'
 import PropTypes from 'prop-types'
 import { useState, useContext, useEffect } from 'react'
-import { generateID } from '../../utils/helpers'
-import { UserContext } from '../../utils/contexts/UserContext'
-import { elapsedString } from '../../utils/time'
+import { generateID } from '../utils/helpers'
+import { UserContext } from '../utils/contexts/UserContext'
+import { elapsedString } from '../utils/time'
 
 export default function Comment(props) {
   const loggedUser = useContext(UserContext);
