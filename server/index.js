@@ -1,13 +1,13 @@
-import fs from 'fs';
-import path from 'path';
-import express from 'express';
-import ViteExpress from 'vite-express';
-import { promises as fsPromises } from "fs";
-import { updateComment } from "./utils/helpers.js";
+const fs = require("fs");
+const path = require("path");
+const express = require("express");
+const fsPromises = require("fs").promises;
+
+const { updateComment } = require("../shared/utils/helpers.js");
 
 const app = express();
 
-const FILEPATH = path.join(process.env.PWD, "data.json");
+const FILEPATH = path.join(__dirname, "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
@@ -185,4 +185,4 @@ app.delete("/api/comments/delete", (req, res) => {
 });
 
 server.loadInitialData(FILEPATH);
-ViteExpress.listen(app, PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
