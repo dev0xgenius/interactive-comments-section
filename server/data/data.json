@@ -19,7 +19,22 @@
         },
         "username": "amyrobson"
       },
-      "replies": []
+      "replies": [
+        {
+          "id": 1736942467,
+          "content": "djdjdj",
+          "createdAt": 1736942467436,
+          "score": 0,
+          "user": {
+            "image": {
+              "png": "./images/avatars/image-juliusomo.png",
+              "webp": "./images/avatars/image-juliusomo.webp"
+            },
+            "username": "juliusomo"
+          },
+          "replyingTo": "amyrobson"
+        }
+      ]
     },
     {
       "id": 2,
@@ -47,6 +62,20 @@
             },
             "username": "ramsesmiron"
           }
+        },
+        {
+          "id": 1736942451,
+          "content": "fuck you",
+          "createdAt": 1736942451067,
+          "score": 0,
+          "user": {
+            "image": {
+              "png": "./images/avatars/image-juliusomo.png",
+              "webp": "./images/avatars/image-juliusomo.webp"
+            },
+            "username": "juliusomo"
+          },
+          "replyingTo": "ramsesmiron"
         }
       ]
     }
