@@ -19,36 +19,7 @@
         },
         "username": "amyrobson"
       },
-      "replies": [
-        {
-          "id": 1736928536,
-          "content": "God idid",
-          "createdAt": 1736928536835,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        },
-        {
-          "id": 1736932086,
-          "content": "confused??",
-          "createdAt": 1736932086244,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        }
-      ]
+      "replies": []
     },
     {
       "id": 2,
@@ -76,20 +47,6 @@
             },
             "username": "ramsesmiron"
           }
-        },
-        {
-          "id": 1736931605,
-          "content": "wen launch",
-          "createdAt": 1736931605129,
-          "score": 3,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "maxblagun"
         }
       ]
     }
