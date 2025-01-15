@@ -1,8 +1,8 @@
-const BASEURL = "http://localhost:5173";
+const BASEURL = "https://zeroxg3nius-comment-section.onrender.com";
 
 async function apiRequest(url, requestObj) {
   return await fetch(`${BASEURL}${url}`, requestObj);
-};
+}
 
 async function getComments(success, controller) {
   let tag;
@@ -37,7 +37,7 @@ async function getComments(success, controller) {
 }
 
 function addComment(comment){
-  fetch('/api/comments/add', {
+  apiRequest('/api/comments/add', {
     headers: {"Content-Type" : "application/json"},
     method: "PUT",
     body: JSON.stringify(comment),
@@ -47,7 +47,7 @@ function addComment(comment){
 
 function addReply(reply, commentID) {
   reply.commentID = commentID;
-  fetch("/api/comment/add/reply", {
+  apiRequest("/api/comment/add/reply", {
     headers: {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify(reply),
@@ -55,7 +55,7 @@ function addReply(reply, commentID) {
 }
 
 function deleteReply(replyID) {
-  fetch("api/comments/delete", {
+  apiRequest("api/comments/delete", {
     headers: {"Content-Type" : "text/plain"},
     method: "DELETE",
     body: replyID,
@@ -63,7 +63,7 @@ function deleteReply(replyID) {
 }
 
 function editComment(id, edit) {
-  fetch("/api/comment/edit", {
+  apiRequest("/api/comment/edit", {
     headers : {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify({id, edit})
@@ -71,7 +71,7 @@ function editComment(id, edit) {
 }
 
 function vote(newCount, id) {
-  return fetch("/api/comment/vote", {
+  apiRequest("/api/comment/vote", {
     headers : {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify({count: newCount, id})
