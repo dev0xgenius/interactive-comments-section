@@ -1,3 +1,9 @@
+const BASEURL = "http://localhost:5173";
+
+async function apiRequest(url, requestObj) {
+  return await fetch(`${BASEURL}${url}`, requestObj);
+};
+
 async function getComments(success, controller) {
   let tag;
   for (;;) {
@@ -50,9 +56,9 @@ function addReply(reply, commentID) {
 
 function deleteReply(replyID) {
   fetch("api/comments/delete", {
-    headers: {"Content-Type" : "application/json"},
+    headers: {"Content-Type" : "text/plain"},
     method: "DELETE",
-    body: replyID
+    body: replyID,
   }).catch(err => console.error("Couldn't complete the operation"));
 }
 
@@ -65,7 +71,7 @@ function editComment(id, edit) {
 }
 
 function vote(newCount, id) {
-  fetch("/api/comment/vote", {
+  return fetch("/api/comment/vote", {
     headers : {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify({count: newCount, id})

@@ -36,7 +36,7 @@ export default function Comment(props) {
     replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "").trim();
     
     const newReply = {
-      id: generateID(props.replies),
+      id: generateID(props.replies || props.siblings),
       content: replyText,
       createdAt: Date.now(),
       score: 0,
@@ -179,6 +179,23 @@ Comment.propTypes = {
 
   replyingTo: PropTypes.string, // For Comment as Reply
   commentID: PropTypes.number, // For Comment as Reply
+  siblings: PropTypes.arrayOf( // For comment as Reply
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      content: PropTypes.string.isRequired,
+      createdAt: PropTypes.number.isRequired,
+      score: PropTypes.number.isRequired,
+      replyingTo: PropTypes.string.isRequired,
+      
+      user: PropTypes.shape({
+        image: PropTypes.shape({
+          png: PropTypes.string,
+          webp: PropTypes.string
+        }),
+        username: PropTypes.string
+      }).isRequired
+    })
+  ),
 
   replies: PropTypes.arrayOf(
     PropTypes.shape({
@@ -187,7 +204,7 @@ Comment.propTypes = {
       createdAt: PropTypes.number.isRequired,
       score: PropTypes.number.isRequired,
       replyingTo: PropTypes.string.isRequired,
-
+      
       user: PropTypes.shape({
         image: PropTypes.shape({
           png: PropTypes.string,

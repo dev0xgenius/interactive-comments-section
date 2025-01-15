@@ -7,7 +7,7 @@ const { updateComment } = require("../shared/utils/helpers.js");
 
 const app = express();
 
-const FILEPATH = path.join(__dirname, "data.json");
+const FILEPATH = path.join(__dirname, "data", "data.json");
 const PORT = process.env.PORT || 5173;
 
 let server = {
@@ -67,6 +67,11 @@ async function saveToDisk(data) {
   } catch (e) { console.log(e); }
 }
 
+// Built-in Express Middlewares
+app.use(express.urlencoded( { extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "..", "client", "dist")));
+
 app.get("/api/comments", (req, res) => {
   let tag = /"(.*)"/.exec(req.headers["if-none-match"]);
   let wait = /\bwait=(\d+)/.exec(req.headers.Prefer);
@@ -93,95 +98,86 @@ app.get("/api/comments", (req, res) => {
 });
 
 app.put("/api/comments/add", (req, res) => {
-  let newComment = null;
-  req.on("data", dataChunk => newComment = JSON.parse(dataChunk.toString()));
-  req.on("end", () => {
-    if (newComment != null) {
-      getData().then(data => {
-        let updatedComments = [...data.comments, newComment];
-        server.cachedData = { ...data, comments: updatedComments };
-        server.updated();
-        res.status(200).end();
-      });
-    }
-  });
+  let newComment = req.body;
+  
+  if (newComment != null) {
+    getData().then(data => {
+      let updatedComments = [...data.comments, newComment];
+      server.cachedData = { ...data, comments: updatedComments };
+      server.updated();
+      res.status(200).end();
+    });
+  }
 });
 
 app.post("/api/comment/add/reply", (req, res) => {
-  let newReply = null;
-  req.on("data", dataChunk => newReply = JSON.parse(dataChunk.toString()));
-  req.on('end', () => {
-    if (newReply != null) {
-      getData().then(data => {
-        let updatedComments = data.comments.map(comment => {
-          if (comment.id === newReply.commentID) {
-            delete newReply.commentID;
-            let updatedReplies = comment.replies.concat(newReply);
-            return Object.assign({}, comment,
-              { replies: updatedReplies }
-            );
-          }
-          return comment;
-        });
-
-        server.cachedData = { ...data, comments: updatedComments };
-        server.updated();
-        res.status(200).end();
+  let newReply = req.body;
+  console.log("Adding reply");
+  
+  if (newReply != null) {
+    getData().then(data => {
+      let updatedComments = data.comments.map(comment => {
+        if (comment.id === newReply.commentID) {
+          delete newReply.commentID;
+          let updatedReplies = comment.replies.concat(newReply);
+          return Object.assign({}, comment,
+            { replies: updatedReplies }
+          );
+        }
+        return comment;
       });
-    }
-  });
+
+      server.cachedData = { ...data, comments: updatedComments };
+      server.updated();
+      res.status(200).end();
+    });
+  }
 });
 
 app.post("/api/comment/edit", (req, res) => {
-  let editInfo = "";
-  req.on("data", dataChunk => editInfo += dataChunk.toString());
-  req.on("end", err => {
-    editInfo = JSON.parse(editInfo);
-    let { id, edit } = editInfo;
-    let { comments } = server.cachedData;
+  let { id, edit } = req.body;
+  let { comments } = server.cachedData;
 
-    server.cachedData.comments = updateComment(comments, id, ["content", edit]);
-    server.updated();
-    res.status(200).end();
-  });
+  server.cachedData.comments = updateComment(comments, id, ["content", edit]);
+  server.updated();
+  res.status(200).end();
 });
 
 app.post("/api/comment/vote", (req, res) => {
-  let voteInfo = "";
-  req.on("data", dataChunk => voteInfo = dataChunk.toString());
-  req.on("end", (err) => {
-    if (err) console.error(err);
-    voteInfo = JSON.parse(voteInfo);
-    if (voteInfo) {
-      let { id, count } = voteInfo;
-      let { comments } = server.cachedData;
+  let voteInfo = req.body;
+  if (voteInfo) {
+    let { count, id } = voteInfo;
+    let { comments } = server.cachedData;
 
-      server.cachedData.comments =
-        updateComment(comments, id, ["score", count]);
-      server.updated();
-      res.status(200).end();
-    } else res.status(500).res.end();
-  });
+    server.cachedData.comments =
+      updateComment(comments, id, ["score", count]);
+    server.updated();
+    res.status(200).end();
+    
+  } else res.status(500).res.end();
 });
 
 app.delete("/api/comments/delete", (req, res) => {
   let replyID = 0;
-  req.on('data', dataChunk => replyID = Number(dataChunk.toString()));
-  req.on('end', () => {
+  req.on("data", dataChunk => replyID += dataChunk.toString());
+  req.on("end", () => {
     getData().then(data => {
       let updatedComments = data.comments.filter(comment => {
         if (comment.replies.length != 0) {
           comment.replies = comment.replies.filter(
             reply => reply.id != replyID);
         }
-
         return (comment.id != replyID);
       });
-
+  
       server.cachedData = { ...data, comments: updatedComments };
       server.updated();
     });
   });
+});
+
+app.get("/*", (req, res) => {
+  res.status(404).send("It doesn't exist");
 });
 
 server.loadInitialData(FILEPATH);
