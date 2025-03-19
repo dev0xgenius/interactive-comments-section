@@ -8,7 +8,7 @@ const { updateComment } = require("../shared/utils/helpers.js");
 const app = express();
 
 const FILEPATH = path.join(__dirname, "data", "data.json");
-const PORT = process.env.PORT || 5173;
+const PORT = process.env.PORT || 5174;
 
 let server = {
   version: 0,
@@ -171,6 +171,7 @@ app.delete("/api/comments/delete", (req, res) => {
       });
   
       server.cachedData = { ...data, comments: updatedComments };
+      console.log(server.cachedData);
       server.updated();
     });
   });
