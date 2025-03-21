@@ -21,7 +21,8 @@ export default function ReplyForm(props) {
           sm:z-10 resize-none h-32 focus:border text-blue-600
           focus:border-blue-300 focus:border-2 outline-0'
           placeholder={props.placeholder || "Reply..."}
-        >{props.content}
+          defaultValue={props.content}
+        >
       </textarea>
       <div className='flex justify-between items-center'>
         <span className='inline-block w-8'>

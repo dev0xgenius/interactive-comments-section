@@ -3,6 +3,7 @@ import Comment from './Comment'
 
 export default function Replies({replies, commentID, actions}) {
   let sortedReplies = replies.sort((a, b) => a.createdAt - b.createdAt);
+  
   return (replies.length == 0) ?
     <></> : (
     <ul className='border-l-2 pl-5 flex flex-col gap-4
@@ -16,6 +17,7 @@ export default function Replies({replies, commentID, actions}) {
               createdAt={reply.createdAt}
               score={reply.score}
               user={reply.user}
+              siblings={replies}
               replyingTo={reply.replyingTo}
               
               commentID={commentID}

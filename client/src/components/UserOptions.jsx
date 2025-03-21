@@ -1,4 +1,4 @@
-import { UserContext } from '../../utils/contexts/UserContext'
+import { UserContext } from '../utils/contexts/UserContext'
 import { useContext } from 'react';
 
 export default function UserOptions(props) {

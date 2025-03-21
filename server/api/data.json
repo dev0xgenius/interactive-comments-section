@@ -11,7 +11,7 @@
       "id": 1,
       "content": "Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.",
       "createdAt": 1729551600000,
-      "score": 13,
+      "score": 14,
       "user": {
         "image": {
           "png": "./images/avatars/image-amyrobson.png",
@@ -19,7 +19,26 @@
         },
         "username": "amyrobson"
       },
+<<<<<<<< HEAD:server/api/data.json
       "replies": []
+========
+      "replies": [
+        {
+          "id": 1736942467,
+          "content": "djdjdj",
+          "createdAt": 1736942467436,
+          "score": 0,
+          "user": {
+            "image": {
+              "png": "./images/avatars/image-juliusomo.png",
+              "webp": "./images/avatars/image-juliusomo.webp"
+            },
+            "username": "juliusomo"
+          },
+          "replyingTo": "amyrobson"
+        }
+      ]
+>>>>>>>> dev:server/data/data.json
     },
     {
       "id": 2,
@@ -49,18 +68,18 @@
           }
         },
         {
-          "id": 4,
-          "content": "I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
-          "createdAt": 1732057200000,
-          "score": 5,
-          "replyingTo": "ramsesmiron",
+          "id": 1736942451,
+          "content": "fuck you",
+          "createdAt": 1736942451067,
+          "score": 0,
           "user": {
             "image": {
               "png": "./images/avatars/image-juliusomo.png",
               "webp": "./images/avatars/image-juliusomo.webp"
             },
             "username": "juliusomo"
-          }
+          },
+          "replyingTo": "ramsesmiron"
         }
       ]
     }

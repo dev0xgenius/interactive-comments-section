@@ -3,9 +3,9 @@ import ReplyForm from './ReplyForm'
 import Modal from './Modal'
 import { useEffect, useState, useContext } from 'react'
 import client from '../api/client'
-import { UserContext } from "../../utils/contexts/UserContext"
-import { generateID, updateComment } from '../../utils/helpers'
-import { elapsedString } from '../../utils/time'
+import { UserContext } from "../utils/contexts/UserContext"
+import { generateID, updateComment } from '../utils/helpers'
+import { elapsedString } from '../utils/time'
 
 export default function App() {
   const [appData, setAppData] = useState();
@@ -65,9 +65,8 @@ export default function App() {
       return comment;
     });
 
-    setAppData(currentState => Object.assign(
-      {}, currentState, { comments: updatedComments }
-    )); client.addReply(reply, commentID);
+    setAppData(currentState => ({ ...currentState,  comments: updatedComments })); 
+    client.addReply(reply, commentID);
   };
 
   const deleteReply = async (replyID) => {
