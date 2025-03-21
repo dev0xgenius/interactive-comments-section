@@ -4,7 +4,6 @@ const express = require("express");
 const fsPromises = require("fs").promises;
 
 const { updateComment } = require("../shared/utils/helpers.js");
-
 const app = express();
 
 const FILEPATH = path.join(__dirname, "data", "data.json");
@@ -178,7 +177,8 @@ app.delete("/api/comments/delete", (req, res) => {
 });
 
 app.get("/*", (req, res) => {
-  res.status(404).send("It doesn't exist");
+  res.status(404);
+  res.send("It doesn't exist");
 });
 
 server.loadInitialData(FILEPATH);

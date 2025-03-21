@@ -1,4 +1,4 @@
-const BASEURL = "https://zeroxg3nius-comment-section.onrender.com";
+const BASEURL = "http://localhost:5174";//"https://zeroxg3nius-comment-section.onrender.com";
 
 async function apiRequest(url, requestObj) {
   return await fetch(`${BASEURL}${url}`, requestObj);
@@ -9,7 +9,7 @@ async function getComments(success, controller) {
   for (;;) {
     let response;
     try {
-      response = await fetch("/api/comments", {
+      response = await apiRequest("/api/comments", {
         headers: tag && {
           Accept: "application/json",
           "If-None-Match": tag,
