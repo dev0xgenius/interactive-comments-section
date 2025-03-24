@@ -60,8 +60,6 @@ function deleteReply(replyID) {
     method: "DELETE",
     body: JSON.stringify({ replyID }),
   }).catch(err => new Error(`Couldn't complete the operation: ${err}`));
-  
-  return "Delete completed";
 }
 
 function editComment(id, edit) {
