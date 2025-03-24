@@ -55,11 +55,13 @@ function addReply(reply, commentID) {
 }
 
 function deleteReply(replyID) {
-  apiRequest("api/comments/delete", {
-    headers: {"Content-Type" : "text/plain"},
+  apiRequest("/api/comment/delete", {
+    headers: {"Content-Type" : "application/json"},
     method: "DELETE",
-    body: replyID,
-  }).catch(err => console.error("Couldn't complete the operation"));
+    body: JSON.stringify({ replyID }),
+  }).catch(err => new Error(`Couldn't complete the operation: ${err}`));
+  
+  return "Delete completed";
 }
 
 function editComment(id, edit) {

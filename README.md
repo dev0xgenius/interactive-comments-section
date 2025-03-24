@@ -42,7 +42,7 @@ Users should be able to:
 - CSS Grid
 - Mobile-first workflow
 - [Tailwind](https://google.com?q=tailwindcss) - CSS Framework
-- [React](https://reactjs.org/) - JS library
+- [React](https://react.dev/) - JS library
 
 ## Author
 

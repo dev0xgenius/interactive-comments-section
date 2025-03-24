@@ -1,5 +1,7 @@
 const generateID = (objArray, usedIDs = new Set([])) => {
-  let newID = null; let idExists = false;
+  let newID = null; 
+  let idExists = false;
+  
   do {
     newID = Math.floor(Date.now() / 1000);
   } while (usedIDs.has(newID));
@@ -7,11 +9,13 @@ const generateID = (objArray, usedIDs = new Set([])) => {
   // Add matching ID into usedIDs 'Set Object' for tracking
   for (const item of objArray) {
     const { id } = item;
+    
     if (Number(id) === newID) {
       idExists = true;
       usedIDs.add(Number(id));
     }
   }
+  
   return (idExists) ? generateID(objArray, usedIDs) : newID;
 };
 
@@ -28,6 +32,7 @@ function updateComment(comments, id, [property, value]) {
     else if (comment.id !== id && !comment.replies) return comment;
     else if (comment.replies) {
       let { replies } = comment;
+      
       replies = replies.map(reply => {
         let updatedReply = { ...reply };
         if (reply.id === id) {

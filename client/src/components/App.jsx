@@ -32,6 +32,7 @@ export default function App() {
 
   useEffect(() => {
     const controller = new AbortController();
+    
     client.getComments(
       data => setAppData(currentState => ({ ...data }))
       , controller);
@@ -71,6 +72,7 @@ export default function App() {
 
   const deleteReply = async (replyID) => {
     let userSelection = await showModal();
+    
     if (userSelection) {
       closeModal();
       let updatedComments = appData.comments.filter(comment => {
@@ -83,7 +85,7 @@ export default function App() {
       });
 
       setAppData(currentData => ({ ...currentData, comments: updatedComments }));
-      client.deleteReply(replyID);
+      
     } else closeModal();
   };
 
