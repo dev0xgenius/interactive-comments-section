@@ -53,7 +53,7 @@ Time.set = function (milliseconds) {
 function elapsedString(date) {
   if (date instanceof Date) {
     let elapsedTime = Date.now() - date.getTime();
-    if (elapsedTime < 1000) return "now";
+    if (elapsedTime < 1000) return "just now";
     
     for (let unit in timeUnitsInMs){
       let unitValue = convertFromMilliseconds(elapsedTime, unit)[0];

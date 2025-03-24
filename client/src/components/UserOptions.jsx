@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types' 
 import { UserContext } from '../utils/contexts/UserContext'
 import { useContext } from 'react';
 
@@ -40,4 +41,17 @@ export default function UserOptions(props) {
         <span className='font-semibold text-blue-300'>Reply</span>
       </button>
     );
+};
+
+UserOptions.propTypes = {
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+  }),
+  
+  toggleForm: PropTypes.func,
+  
+  actions: PropTypes.shape({
+    deleteReply: PropTypes.func,
+    editReply: PropTypes.func
+  }),
 };

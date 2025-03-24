@@ -1,11 +1,10 @@
 import Comments from './Comments'
 import ReplyForm from './ReplyForm'
 import Modal from './Modal'
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState } from 'react'
 import client from '../api/client'
 import { UserContext } from "../utils/contexts/UserContext"
 import { generateID, updateComment } from '../utils/helpers'
-import { elapsedString } from '../utils/time'
 
 export default function App() {
   const [appData, setAppData] = useState();
@@ -16,7 +15,7 @@ export default function App() {
 
   const showModal = () => {
     return new Promise(resolve => {
-      setModalState(s => ({
+      setModalState(() => ({
         isOpen: true,
         handleResponse: resolve,
       }));
@@ -24,7 +23,7 @@ export default function App() {
   };
 
   const closeModal = () => {
-    setModalState(s => ({
+    setModalState(() => ({
       isOpen: false,
       handleResponse: null
     }));
@@ -34,7 +33,7 @@ export default function App() {
     const controller = new AbortController();
     
     client.getComments(
-      data => setAppData(currentState => ({ ...data }))
+      data => setAppData(() => ({ ...data }))
       , controller);
   }, []);
 
@@ -145,7 +144,7 @@ export default function App() {
     </UserContext.Provider>
   ) : (
     <div className="bg-white rounded-xl font-mono flex justify-center items-center p-8">
-      <p className="text-md">Couldn't Fetch Data...</p>
+      <p className="text-md">Could not Fetch Data...</p>
     </div>
   );
 };

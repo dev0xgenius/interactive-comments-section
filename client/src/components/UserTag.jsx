@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { UserContext } from '../utils/contexts/UserContext'
 import { useContext } from 'react'
 
@@ -21,3 +22,14 @@ export default function UserTag({ user }) {
     </span>
   );
 }
+
+UserTag.propTypes = {
+  user: PropTypes.shape({
+    image: PropTypes.shape({
+      png: PropTypes.string.isRequired,
+      webp: PropTypes.string,
+    }).isRequired,
+    
+    username: PropTypes.string
+  }).isRequired
+};

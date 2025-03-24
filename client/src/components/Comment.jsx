@@ -13,7 +13,7 @@ export default function Comment(props) {
   const [editForm, setEditForm] = useState(false);
   const [formState, setFormState] = useState({
     isOpen: false,
-    action: () => {},
+    action: () => null,
     actionText: "",
     placeholder: "",
     content: "",
@@ -45,6 +45,7 @@ export default function Comment(props) {
     };
 
     closeForm();
+    
     if (replyText)
       props.actions.addReply(newReply, props.commentID || props.id);
   };
@@ -53,6 +54,7 @@ export default function Comment(props) {
 
   const handleEditedReply = (editedReply) => {
     toggleEditForm();
+    
     editedReply = editedReply.replace(/(^@[0-9a-z]+,?)/, "");
     if(editedReply.trim()) 
       props.actions.editReply(editedReply, props.id);
@@ -94,7 +96,7 @@ export default function Comment(props) {
       actionText: "REPLY"
     }
     ));
-  }, []);
+  }, [addReply, loggedUser]);
 
   return (
     <div className='flex flex-col gap-4'>
@@ -224,7 +226,7 @@ Comment.propTypes = {
   }).isRequired,
 
   actions: PropTypes.shape({
-    handleReply: PropTypes.func,
+    addReply: PropTypes.func,
     editReply: PropTypes.func,
     deleteReply: PropTypes.func,
     vote: PropTypes.func,

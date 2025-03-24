@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 export default function Modal(props) {
 	return props.isOpen ? (
 		<div
@@ -35,3 +37,10 @@ export default function Modal(props) {
 		</div>
 	) : <></>
 }
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool,
+  headerMsg: PropTypes.string,
+  mainMsg: PropTypes.string,
+  handleResponse: PropTypes.func
+};

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
 import plusIcon from '/images/icon-plus.svg'
 import minusIcon from '/images/icon-minus.svg'

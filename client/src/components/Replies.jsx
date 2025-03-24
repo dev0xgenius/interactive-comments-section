@@ -39,7 +39,7 @@ Replies.propTypes = {
   
   commentID: PropTypes.number.isRequired,
   
-  data: PropTypes.arrayOf(
+  replies: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       content: PropTypes.string.isRequired || PropTypes.shape({}),

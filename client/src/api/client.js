@@ -42,7 +42,7 @@ function addComment(comment){
     method: "PUT",
     body: JSON.stringify(comment),
   }).then(response => console.log(response.statusText))
-    .catch(err => "Couldn't fetch data...");
+    .catch(err => new Error(`Couldn't fetch data: ${err}`));
 }
 
 function addReply(reply, commentID) {
@@ -51,7 +51,7 @@ function addReply(reply, commentID) {
     headers: {"Content-Type" : "application/json"},
     method: "POST",
     body: JSON.stringify(reply),
-  }).catch(err => console.error("Couldn't add reply"));
+  }).catch(err => console.error(`Couldn't add reply: ${err}`));
 }
 
 function deleteReply(replyID) {
