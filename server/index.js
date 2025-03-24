@@ -28,6 +28,7 @@ server.waitForChanges = function (time) {
 
 server.updated = function () {
   server.version += 1;
+  
   getData()
     .then(data => {
       let response = {
@@ -49,6 +50,7 @@ server.updated = function () {
 server.loadInitialData = filePath => {
   let outputBuffer = [];
   const readStream = fs.createReadStream(filePath);
+  
   readStream.on("data", dataChunk => outputBuffer.push(dataChunk));
   readStream.on("end", () =>
     server.cachedData = JSON.parse(outputBuffer.toString())
@@ -111,7 +113,6 @@ app.put("/api/comments/add", (req, res) => {
 
 app.post("/api/comment/add/reply", (req, res) => {
   let newReply = req.body;
-  console.log("Adding reply");
   
   if (newReply != null) {
     getData().then(data => {
@@ -144,6 +145,7 @@ app.post("/api/comment/edit", (req, res) => {
 
 app.post("/api/comment/vote", (req, res) => {
   let voteInfo = req.body;
+  
   if (voteInfo) {
     let { count, id } = voteInfo;
     let { comments } = server.cachedData;
@@ -156,23 +158,21 @@ app.post("/api/comment/vote", (req, res) => {
   } else res.status(500).res.end();
 });
 
-app.delete("/api/comments/delete", (req, res) => {
-  let replyID = 0;
-  req.on("data", dataChunk => replyID += dataChunk.toString());
-  req.on("end", () => {
-    getData().then(data => {
-      let updatedComments = data.comments.filter(comment => {
-        if (comment.replies.length != 0) {
-          comment.replies = comment.replies.filter(
-            reply => reply.id != replyID);
-        }
-        return (comment.id != replyID);
-      });
-  
-      server.cachedData = { ...data, comments: updatedComments };
-      console.log(server.cachedData);
-      server.updated();
+app.delete("/api/comment/delete", (req, res) => {
+  const {replyID} = req.body;
+
+  getData()
+  .then(data => {
+    let updatedComments = data.comments.filter(comment => {
+      if (comment.replies.length != 0) {
+        comment.replies = comment.replies.filter(
+          reply => reply.id != replyID);
+      }
+      return (comment.id != replyID);
     });
+
+    server.cachedData = { ...data, comments: updatedComments };
+    server.updated();
   });
 });
 
