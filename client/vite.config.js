@@ -7,4 +7,10 @@ export default defineConfig({
   root: "./",
   outputDir: "../dist",
   publicDir: "public",
+  
+  server: {
+    cors: {
+      origin: "http://localhost:5174"
+    }
+  }
 })

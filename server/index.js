@@ -18,6 +18,7 @@ let server = {
 server.waitForChanges = function (time) {
   return new Promise(resolve => {
     server.waiting.push(resolve);
+    
     setTimeout(() => {
       if (!server.waiting.includes(resolve)) return;
       server.waiting = server.waiting.filter(r => r != resolve);
@@ -44,7 +45,7 @@ server.updated = function () {
     });
 
   server.waiting = [];
-  setTimeout(() => saveToDisk(server.cachedData), 500);
+  setTimeout(() => saveToDisk(server.cachedData), 3000);
 };
 
 server.loadInitialData = filePath => {
