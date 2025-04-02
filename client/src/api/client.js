@@ -1,4 +1,4 @@
-const BASEURL = "http://localhost:5173";//"https://zeroxg3nius-comment-section.onrender.com";
+const BASEURL = "https://zeroxg3nius-comment-section.onrender.com";
 
 async function apiRequest(url, requestObj) {
   return await fetch(`${BASEURL}${url}`, requestObj);
