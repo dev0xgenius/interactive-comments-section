@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
+const cors = require("cors");
 const fsPromises = require("fs").promises;
 
 const { updateComment } = require("../shared/utils/helpers.js");
@@ -68,6 +69,9 @@ async function saveToDisk(data) {
 }
 
 // Built-in Express Middlewares
+app.use(cors({
+	origin: "https://interactive-comments-section-opal.vercel.app"
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(express.static(path.join(__dirname, "..", "client", "dist")));
