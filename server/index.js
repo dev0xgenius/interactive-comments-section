@@ -70,7 +70,7 @@ async function saveToDisk(data) {
 // Built-in Express Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "client", "dist")));
+// app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 app.get("/api/comments", (req, res) => {
     let tag = /"(.*)"/.exec(req.headers["if-none-match"]);
@@ -172,11 +172,6 @@ app.delete("/api/comments/delete/:id", (req, res) => {
         server.cachedData = { ...data, comments: updatedComments };
         server.updated();
     });
-});
-
-app.get("/*", (req, res) => {
-    res.status(301);
-    res.redirect("/");
 });
 
 server.loadInitialData(FILEPATH);
