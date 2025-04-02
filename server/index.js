@@ -44,7 +44,7 @@ server.updated = function () {
         });
 
     server.waiting = [];
-    setTimeout(() => saveToDisk(server.cachedData), 500);
+    setTimeout(() => saveToDisk(server.cachedData), 1000);
 };
 
 server.loadInitialData = filePath => {
