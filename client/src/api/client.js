@@ -1,4 +1,4 @@
-const BASEURL = "https://zeroxg3nius-comment-section.onrender.com";
+const BASEURL = "http://localhost:5173";//"https://zeroxg3nius-comment-section.onrender.com";
 
 async function apiRequest(url, requestObj) {
   return await fetch(`${BASEURL}${url}`, requestObj);
@@ -55,11 +55,8 @@ function addReply(reply, commentID) {
 }
 
 function deleteReply(replyID) {
-  apiRequest("api/comments/delete", {
-    headers: {"Content-Type" : "text/plain"},
-    method: "DELETE",
-    body: replyID,
-  }).catch(err => console.error("Couldn't complete the operation"));
+  apiRequest(`/api/comments/delete/${replyID}`, { method: "DELETE"})
+    .catch(err => console.error("Couldn't complete the operation"));
 }
 
 function editComment(id, edit) {

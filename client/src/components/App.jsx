@@ -71,6 +71,7 @@ export default function App() {
 
   const deleteReply = async (replyID) => {
     let userSelection = await showModal();
+    
     if (userSelection) {
       closeModal();
       let updatedComments = appData.comments.filter(comment => {
