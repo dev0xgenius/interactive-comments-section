@@ -112,7 +112,6 @@ app.put("/api/comments/add", (req, res) => {
 
 app.post("/api/comment/add/reply", (req, res) => {
     let newReply = req.body;
-    console.log("Adding reply");
 
     if (newReply != null) {
         getData().then(data => {
