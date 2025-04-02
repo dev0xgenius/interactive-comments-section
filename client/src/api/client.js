@@ -9,7 +9,7 @@ async function getComments(success, controller) {
   for (;;) {
     let response;
     try {
-      response = await fetch("/api/comments", {
+      response = await apiRequest("/api/comments", {
         headers: tag && {
           Accept: "application/json",
           "If-None-Match": tag,
