@@ -1,19 +1,23 @@
 const BASEURL = "http://localhost:5173"; //"https://interactive-comments-section-backend.vercel.app";
 async function apiRequest(url, requestObj) {
-  return await fetch(`${BASEURL}${url}`, requestObj);
+  const modifiedUrl = `${BASEURL}${url}`;
+  return await fetch(modifiedUrl, requestObj);
 }
 
 async function getComments(success, controller) {
-  let tag;
+  let tag = undefined;
   for (;;) {
     let response;
+    let headers = new Headers();
+
     try {
+      if (tag != undefined) {
+        headers.append("if-none-match", tag);
+        headers.append("prefer", "wait=90");
+      }
+
       response = await apiRequest("/api/comments", {
-        headers: tag && {
-          Accept: "application/json",
-          "If-None-Match": tag,
-          Prefer: "wait=90",
-        },
+        headers,
         signal: controller.signal,
       });
     } catch (e) {

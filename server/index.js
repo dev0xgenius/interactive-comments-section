@@ -20,6 +20,7 @@ let server = {
 server.waitForChanges = function (time) {
   return new Promise((resolve) => {
     server.waiting.push(resolve);
+
     setTimeout(() => {
       if (!server.waiting.includes(resolve)) return;
       server.waiting = server.waiting.filter((r) => r != resolve);
@@ -30,6 +31,7 @@ server.waitForChanges = function (time) {
 
 server.updated = function () {
   server.version += 1;
+
   getData().then((data) => {
     let response = {
       body: JSON.stringify(data),
@@ -41,10 +43,9 @@ server.updated = function () {
     };
 
     server.waiting.forEach((resolve) => resolve(response));
+    server.waiting = [];
+    setTimeout(() => saveToDisk(server.cachedData), 1000);
   });
-
-  server.waiting = [];
-  setTimeout(() => saveToDisk(server.cachedData), 1000);
 };
 
 server.loadInitialData = (filePath) => {
@@ -72,17 +73,22 @@ async function saveToDisk(data) {
 // Built-in Express Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5174", //"https://interactive-comments-section-opal.vercel.app",
+    origin: [
+      "http://localhost:5174",
+      "http://localhost:4173",
+      "https://interactive-comments-section-opal.vercel.app",
+    ],
+    allowedHeaders: "*",
+    exposedHeaders: "*",
   }),
 );
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 app.get("/api/comments", (req, res) => {
   let tag = /"(.*)"/.exec(req.headers["if-none-match"]);
-  let wait = /\bwait=(\d+)/.exec(req.headers.Prefer);
+  let wait = /\bwait=(\d+)/.exec(req.headers["prefer"]);
 
   if (!tag || Number(tag[1]) != server.version) {
     getData().then((data) => {
@@ -92,14 +98,13 @@ app.get("/api/comments", (req, res) => {
         "Cache-Control": "no-store",
       });
 
-      res.status = 200;
       res.end(JSON.stringify(data));
     });
   } else if (!wait) {
-    res.status = 304;
+    res.statusCode(304).end();
   } else {
     server.waitForChanges(Number(wait[1])).then((response) => {
-      Object.assign(res, response);
+      res = Object.assign(res, response);
       res.end();
     });
   }
@@ -160,7 +165,7 @@ app.post("/api/comment/vote", (req, res) => {
   } else res.status(500).res.end();
 });
 
-app.delete("/api/comments/delete/:id", (req, res) => {
+app.delete("/api/comments/delete/:id", (req, _) => {
   let { id } = req.params;
 
   getData().then((data) => {

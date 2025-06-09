@@ -49,6 +49,20 @@
           }
         }
       ]
+    },
+    {
+      "id": 1749510874,
+      "content": "What's up?",
+      "score": 0,
+      "createdAt": 1749510874213,
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-juliusomo.png",
+          "webp": "./images/avatars/image-juliusomo.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
     }
   ]
 }
