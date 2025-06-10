@@ -32,6 +32,10 @@ export default function App() {
   useEffect(() => {
     const controller = new AbortController();
     client.getComments((data) => setAppData(() => ({ ...data })), controller);
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const addComment = (comment) => {
@@ -152,4 +156,3 @@ export default function App() {
     </div>
   );
 }
-

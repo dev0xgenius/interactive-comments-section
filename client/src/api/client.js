@@ -51,6 +51,7 @@ function addComment(comment) {
 
 function addReply(reply, commentID) {
   reply.commentID = commentID;
+
   apiRequest("/api/comment/add/reply", {
     headers: { "Content-Type": "application/json" },
     method: "POST",

@@ -35,6 +35,7 @@ server.updated = function () {
   getData().then((data) => {
     let response = {
       body: JSON.stringify(data),
+      statusCode: 200,
       headers: {
         "Content-Type": "application/json",
         ETag: `"${server.version}"`,
@@ -44,13 +45,14 @@ server.updated = function () {
 
     server.waiting.forEach((resolve) => resolve(response));
     server.waiting = [];
-    setTimeout(() => saveToDisk(server.cachedData), 1000);
+    setTimeout(() => saveToDisk(server.cachedData), 5000);
   });
 };
 
 server.loadInitialData = (filePath) => {
   let outputBuffer = [];
   const readStream = fs.createReadStream(filePath);
+
   readStream.on("data", (dataChunk) => outputBuffer.push(dataChunk));
   readStream.on(
     "end",
@@ -165,7 +167,7 @@ app.post("/api/comment/vote", (req, res) => {
   } else res.status(500).res.end();
 });
 
-app.delete("/api/comments/delete/:id", (req, _) => {
+app.delete("/api/comments/delete/:id", (req, res) => {
   let { id } = req.params;
 
   getData().then((data) => {
@@ -178,6 +180,7 @@ app.delete("/api/comments/delete/:id", (req, _) => {
 
     server.cachedData = { ...data, comments: updatedComments };
     server.updated();
+    res.status(200).end();
   });
 });
 
