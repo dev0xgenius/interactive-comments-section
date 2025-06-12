@@ -1,4 +1,4 @@
-const BASEURL = "http://localhost:5173"; //"https://interactive-comments-section-backend.vercel.app";
+const BASEURL = "https://interactive-comments-section-backend.vercel.app";
 async function apiRequest(url, requestObj) {
   const modifiedUrl = `${BASEURL}${url}`;
   return await fetch(modifiedUrl, requestObj);
