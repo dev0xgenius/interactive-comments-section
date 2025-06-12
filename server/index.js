@@ -77,7 +77,6 @@ const corsWhitelist = [
   "http://localhost:5174",
   "http://localhost:4173",
   "https://interactive-comments-section-opal.vercel.app",
-  "https://interactive-comments-section-backend.vercel.app"
 ];
 
 app.use(
