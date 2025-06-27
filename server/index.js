@@ -73,18 +73,19 @@ async function saveToDisk(data) {
 }
 
 // Built-in Express Middlewares
-const corsWhitelist = [
-  "http://localhost:5174",
-  "http://localhost:4173",
-  "https://interactive-comments-section-opal.vercel.app",
-];
+// const corsWhitelist = [
+//   "http://localhost:5174",
+//   "http://localhost:4173",
+//   "https://interactive-comments-section-opal.vercel.app",
+// ];
 
 app.use(
-  cors({
-    origin: corsWhitelist,
-    allowedHeaders: "*",
-    exposedHeaders: "*",
-  }),
+  cors({origin: "*"})
+  // cors({
+  //   origin: corsWhitelist,
+  //   allowedHeaders: "*",
+  //   exposedHeaders: "*",
+  // }),
 );
 
 app.use(express.urlencoded({ extended: true }));
