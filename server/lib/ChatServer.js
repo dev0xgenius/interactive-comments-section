@@ -7,10 +7,10 @@ class ChatServer {
 
   // baseUrl should contain the port number
   // use process.env.PORT or custom port e.g 8080
-  constructor(httpServer, baseUrl, path = "/chat") {
+  constructor({ httpServer, baseUrl, path = "/chat" }) {
     this.#socket = new WebSocketServer({ noServer: true });
     this.#server = createServer(httpServer);
-    this.messages = [2, 4];
+    this.messages = [];
 
     this.#server.on("upgrade", (req, socket, head) => {
       const { pathname } = new URL(req.url, baseUrl);
@@ -32,7 +32,7 @@ class ChatServer {
     });
 
     client.on("message", (data) => {
-      this.broadCastMessage(data, client);
+      this.broadcastMessage(data, client);
     });
 
     client.on("error", (err) => console.log(`An error occured: ${err}`));
@@ -46,7 +46,7 @@ class ChatServer {
     callback(this.#server);
   }
 
-  broadCastMessage(data, client = undefined) {
+  broadcastMessage(data, client = undefined) {
     this.#socket.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(data.toString(), (err) => {
