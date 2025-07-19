@@ -1,13 +1,39 @@
-import Comments from "./Comments";
-import ReplyForm from "./ReplyForm";
-import Modal from "./Modal";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import client from "../api/client";
+import useWebSocket from "../hooks/useWebSocket";
 import { UserContext } from "../utils/contexts/UserContext";
 import { generateID, updateComment } from "../utils/helpers";
+import Comments from "./Comments";
+import Modal from "./Modal";
+import ReplyForm from "./ReplyForm";
 
 export default function App() {
-  const [appData, setAppData] = useState();
+  const [getInitialMessage] = useWebSocket("ws://localhost:8080/comments");
+
+  const { isLoading, data: comments } = useQuery({
+    queryKey: ["comments"],
+    queryFn: getInitialMessage,
+  });
+
+  const [appData, setAppData] = useState({
+    currentUser: {
+      image: {
+        png: "./images/avatars/image-juliusomo.png",
+        webp: "./images/avatars/image-juliusomo.webp",
+      },
+      username: "juliusomo",
+    },
+    comments: [],
+  });
+
+  useEffect(() => {
+    if (comments != undefined) {
+      setAppData((prevState) => {
+        return { ...prevState, comments: comments };
+      });
+    }
+  }, [comments]);
+
   const [modalState, setModalState] = useState({
     isOpen: false,
     handleResponse: null,
@@ -29,18 +55,9 @@ export default function App() {
     }));
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
-    client.getComments((data) => setAppData(() => ({ ...data })), controller);
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
   const addComment = (comment) => {
     const newComment = {
-      id: generateID(appData.comments),
+      id: generateID(comments),
       content: comment,
       score: 0,
       createdAt: Date.now(),
@@ -48,11 +65,10 @@ export default function App() {
       replies: [],
     };
 
-    let updatedComments = [...appData.comments, newComment];
+    let updatedComments = [comments, newComment];
     setAppData((currentState) =>
       Object.assign({}, currentState, { comments: updatedComments }),
     );
-    client.addComment(newComment);
   };
 
   const addReply = (reply, commentID) => {
@@ -68,7 +84,6 @@ export default function App() {
       ...currentState,
       comments: updatedComments,
     }));
-    client.addReply(reply, commentID);
   };
 
   const deleteReply = async (replyID) => {
@@ -90,7 +105,6 @@ export default function App() {
         ...currentData,
         comments: updatedComments,
       }));
-      client.deleteReply(replyID);
     } else closeModal();
   };
 
@@ -102,11 +116,10 @@ export default function App() {
       ...currentData,
       comments: updatedComments,
     }));
-    client.editComment(id, editedReply);
   };
 
   const vote = (count, id) => {
-    const { comments } = appData;
+    let { comments } = appData;
     const counter = (count, oldVal) =>
       oldVal || count > 0 ? oldVal + count : oldVal;
 
@@ -114,8 +127,6 @@ export default function App() {
       "score",
       (comment) => {
         let newScore = counter(count, comment.score);
-        client.vote(newScore, id);
-
         return newScore;
       },
     ]);
@@ -126,7 +137,7 @@ export default function App() {
     }));
   };
 
-  return appData != null ? (
+  return !isLoading ? (
     <UserContext.Provider value={appData.currentUser}>
       <Modal
         mainMsg="Are you sure you want to remove this comment?

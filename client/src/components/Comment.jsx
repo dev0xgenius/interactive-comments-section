@@ -98,7 +98,7 @@ export default function Comment(props) {
     }));
   }, [loggedUser, addReply, props.user.username]);
 
-  return (
+    return (
     <div className="flex flex-col gap-4">
       <div className="comment rounded-2xl p-5 bg-white-100 h-max">
         <div
@@ -237,4 +237,3 @@ Comment.propTypes = {
     vote: PropTypes.func,
   }).isRequired,
 };
-
