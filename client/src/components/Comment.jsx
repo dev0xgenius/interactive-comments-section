@@ -1,12 +1,12 @@
+import PropTypes from "prop-types";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { UserContext } from "../utils/contexts/UserContext";
+import { elapsedString } from "../utils/time";
+import { generateID } from "../utils/helpers.js";
 import Counter from "./Counter";
 import ReplyForm from "./ReplyForm";
 import UserOptions from "./UserOptions";
 import UserTag from "./UserTag";
-import PropTypes from "prop-types";
-import { useState, useContext, useEffect, useCallback } from "react";
-import { generateID } from "../utils/helpers";
-import { UserContext } from "../utils/contexts/UserContext";
-import { elapsedString } from "../utils/time";
 
 export default function Comment(props) {
   const loggedUser = useContext(UserContext);
@@ -39,9 +39,7 @@ export default function Comment(props) {
       const newReply = {
         id: generateID(props.replies || props.siblings),
         content: replyText,
-        createdAt: Date.now(),
         score: 0,
-        user: loggedUser,
         replyingTo: props.user.username,
       };
 
@@ -49,7 +47,7 @@ export default function Comment(props) {
       if (replyText)
         props.actions.addReply(newReply, props.commentID || props.id);
     },
-    [loggedUser, props],
+    [props],
   );
 
   const deleteReply = () => props.actions.deleteReply(props.id);
@@ -98,7 +96,7 @@ export default function Comment(props) {
     }));
   }, [loggedUser, addReply, props.user.username]);
 
-    return (
+  return (
     <div className="flex flex-col gap-4">
       <div className="comment rounded-2xl p-5 bg-white-100 h-max">
         <div

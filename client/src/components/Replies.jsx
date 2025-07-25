@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import Comment from "./Comment";
 
-export default function Replies({ replies, commentID, actions }) {
+export default function Replies({ replies, actions }) {
   let sortedReplies = replies.sort((a, b) => a.createdAt - b.createdAt);
 
   return replies.length == 0 ? (
@@ -22,7 +22,7 @@ export default function Replies({ replies, commentID, actions }) {
               user={reply.user}
               siblings={replies}
               replyingTo={reply.replyingTo}
-              commentID={commentID}
+              commentID={reply.commentID}
               actions={actions}
             />
           </li>
@@ -31,6 +31,7 @@ export default function Replies({ replies, commentID, actions }) {
     </ul>
   );
 }
+
 const dataShape = PropTypes.arrayOf(
   PropTypes.shape({
     id: PropTypes.number.isRequired,
@@ -60,4 +61,3 @@ Replies.propTypes = {
   replies: dataShape,
   data: dataShape,
 };
-

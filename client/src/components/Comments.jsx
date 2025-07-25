@@ -4,6 +4,7 @@ import Replies from "./Replies.jsx";
 
 export default function Comments(props) {
   let comments = props.data.sort((a, b) => b.score - a.score);
+
   comments = comments.map((comment) => {
     return (
       <li key={comment.id}>
@@ -23,7 +24,6 @@ export default function Comments(props) {
         >
           <Replies
             replies={comment.replies}
-            commentID={comment.id}
             actions={props.actions}
             targetUser={comment.user.username}
           />

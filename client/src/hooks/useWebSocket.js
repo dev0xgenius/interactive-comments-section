@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useEffect } from "react";
 
-export default function useWebSocket(url) {
+export default function useWebSocket(url, handleMessage) {
   let initialMessage = useRef(null);
   let messageHandler = useRef((data) =>
     console.log(
@@ -35,8 +35,10 @@ export default function useWebSocket(url) {
   useEffect(() => {
     const websocket = new WebSocket(url);
     websocket.onopen = () => {
-      console.log("I active die!!!");
-      messageHandler.current = websocket.send;
+      messageHandler.current = (data) => {
+        if (typeof data == "string") websocket.send(data);
+        else websocket.send(JSON.stringify(data));
+      };
     };
 
     websocket.addEventListener(
@@ -46,17 +48,21 @@ export default function useWebSocket(url) {
           initialMessage.current = JSON.parse(event.data);
 
         websocket.addEventListener("message", (event) => {
-          const data = event.data;
-          console.log(`Received Message: ${data}`);
+          const { data } = event;
+          handleMessage(JSON.parse(data));
         });
       },
       { once: true },
     );
 
+    websocket.onerror = (event) => {
+      console.log(event);
+    };
+
     return () => {
       websocket.close();
     };
-  }, [initialMessage, url]);
+  }, [initialMessage, handleMessage, url]);
 
   return [getInitialMessage, messageHandler.current];
 }
