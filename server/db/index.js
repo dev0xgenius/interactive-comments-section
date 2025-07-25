@@ -61,7 +61,7 @@ const getReplies = (commentId) => {
       reject(new Error("User doesn't exist", { cause: "Invalid User ID" }));
 
     pool
-      .query(`SELECT * FROM replies WHERE replying_to=$1`, [commentId])
+      .query(`SELECT * FROM replies WHERE comment_id=$1`, [commentId])
       .then((data) => resolve(data.rows))
       .catch(reject);
   });

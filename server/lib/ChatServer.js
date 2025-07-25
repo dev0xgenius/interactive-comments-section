@@ -7,9 +7,11 @@ class ChatServer {
 
   // baseUrl should contain the port number
   // use process.env.PORT or custom port e.g 8080
-  constructor({ httpServer, baseUrl, path = "/chat" }) {
+  constructor({ httpServer, baseUrl, path = "/chat" }, messageResolver) {
     this.#socket = new WebSocketServer({ noServer: true });
     this.#server = createServer(httpServer);
+    this.messageResolver = messageResolver;
+
     this.messages = [];
 
     this.#server.on("upgrade", (req, socket, head) => {
@@ -23,6 +25,11 @@ class ChatServer {
         socket.destroy();
       }
     });
+
+    this.#server.on("error", (err, client) => {
+      console.log(client);
+      console.log(err);
+    });
   }
 
   #connectionHandler(client, req) {
@@ -35,7 +42,8 @@ class ChatServer {
       this.broadcastMessage(data, client);
     });
 
-    client.on("error", (err) => console.log(`An error occured: ${err}`));
+    client.on("error", (err) => this.#server.emit("error", err, this));
+
     client.on("close", () => {
       console.log("connection closed");
     });
@@ -47,13 +55,21 @@ class ChatServer {
   }
 
   broadcastMessage(data, client = undefined) {
-    this.#socket.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(data.toString(), (err) => {
-          if (err) throw new Error(err);
-        });
-      }
-    });
+    const onError = (err) => {
+      if (err) this.#server.emit("error", err, client);
+    };
+
+    const broadcastToAll = (message) => {
+      for (const client of this.#socket.clients)
+        if (client.readyState === WebSocket.OPEN) client.send(message, onError);
+    };
+
+    this.messageResolver(data)
+      .then((resolvedMessage) => {
+        broadcastToAll(resolvedMessage);
+        this.messages = this.messages.concat(JSON.parse(resolvedMessage));
+      })
+      .catch(onError);
   }
 }
 
