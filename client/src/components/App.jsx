@@ -104,7 +104,7 @@ export default function App() {
       if (comment.id === id) currentScore = comment.score;
       else if (comment.replies.length > 0) {
         comment.replies.forEach((reply) => {
-          currentScore = reply.id == id && reply.score;
+          currentScore = reply.id === id && reply.score;
         });
       }
     });

@@ -51,7 +51,7 @@ async function deleteReply(reply) {
 async function editReply(data) {
   let { id } = data;
   let column_name = data.content ? "content" : "score";
-  let column_value = data.content || data.score;
+  let column_value = data.content ? String(data.content) : Number(data.score);
 
   try {
     let result =
