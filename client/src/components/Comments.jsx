@@ -1,10 +1,11 @@
-import PropTypes from 'prop-types'
-import Comment from './Comment'
-import Replies from './Replies.jsx'
+import PropTypes from "prop-types";
+import Comment from "./Comment";
+import Replies from "./Replies.jsx";
 
 export default function Comments(props) {
   let comments = props.data.sort((a, b) => b.score - a.score);
-  comments = comments.map(comment => {
+
+  comments = comments.map((comment) => {
     return (
       <li key={comment.id}>
         <Comment
@@ -14,29 +15,29 @@ export default function Comments(props) {
           score={comment.score}
           user={comment.user}
           replies={comment.replies}
-          
           actions={props.actions}
         />
-        <div className={
-          (comment.replies.length) ? "sm:pl-12 sm:mt-6 my-5" : "hidden"
-        }>
-          <Replies 
+        <div
+          className={
+            comment.replies.length ? "sm:pl-12 sm:mt-6 my-5" : "hidden"
+          }
+        >
+          <Replies
             replies={comment.replies}
-            commentID={comment.id}
             actions={props.actions}
             targetUser={comment.user.username}
           />
         </div>
       </li>
     );
-  })
+  });
 
   return (
     <div className="wrapper">
-      <ul className='flex flex-col gap-4 py-4'>{comments}</ul>
+      <ul className="flex flex-col gap-4 py-4">{comments}</ul>
     </div>
   );
-};
+}
 
 Comments.propTypes = {
   actions: PropTypes.shape({
@@ -59,24 +60,24 @@ Comments.propTypes = {
           createdAt: PropTypes.number.isRequired,
           score: PropTypes.number.isRequired,
           replyingTo: PropTypes.string.isRequired,
-          
+
           user: PropTypes.shape({
             image: PropTypes.shape({
               png: PropTypes.string,
-              webp: PropTypes.string
+              webp: PropTypes.string,
             }),
-            username: PropTypes.string
-          }).isRequired
-        })
+            username: PropTypes.string,
+          }).isRequired,
+        }),
       ),
 
       user: PropTypes.shape({
         image: PropTypes.shape({
           png: PropTypes.string,
-          webp: PropTypes.string
+          webp: PropTypes.string,
         }),
-        username: PropTypes.string
-      }).isRequired
-    })
-  )
+        username: PropTypes.string,
+      }).isRequired,
+    }),
+  ),
 };

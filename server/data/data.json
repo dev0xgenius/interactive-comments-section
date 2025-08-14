@@ -11,7 +11,7 @@
       "id": 1,
       "content": "Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.",
       "createdAt": 1729551600000,
-      "score": 14,
+      "score": 13,
       "user": {
         "image": {
           "png": "./images/avatars/image-amyrobson.png",
@@ -19,28 +19,13 @@
         },
         "username": "amyrobson"
       },
-      "replies": [
-        {
-          "id": 1736942467,
-          "content": "djdjdj",
-          "createdAt": 1736942467436,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "amyrobson"
-        }
-      ]
+      "replies": []
     },
     {
       "id": 2,
       "content": "Woah, your project looks awesome! How long have you been coding for? I'm still new, but think I want to dive into React as well soon. Perhaps you can give me an insight on where I can learn React? Thanks!",
       "createdAt": 1728342000000,
-      "score": 5,
+      "score": 14,
       "user": {
         "image": {
           "png": "./images/avatars/image-maxblagun.png",
@@ -53,7 +38,7 @@
           "id": 3,
           "content": "If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.",
           "createdAt": 1728946800000,
-          "score": 3,
+          "score": 12,
           "replyingTo": "maxblagun",
           "user": {
             "image": {
@@ -62,20 +47,6 @@
             },
             "username": "ramsesmiron"
           }
-        },
-        {
-          "id": 1736942451,
-          "content": "fuck you",
-          "createdAt": 1736942451067,
-          "score": 0,
-          "user": {
-            "image": {
-              "png": "./images/avatars/image-juliusomo.png",
-              "webp": "./images/avatars/image-juliusomo.webp"
-            },
-            "username": "juliusomo"
-          },
-          "replyingTo": "ramsesmiron"
         }
       ]
     }

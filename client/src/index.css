@@ -7,18 +7,21 @@
     min-height: 100vh;
     background-color: hsl(223, 19%, 93%);
   }
-  
-  .author { @apply font-bold text-blue-600; }
-  
-  .modal-bg { background-color: rgba(0,0,0,0.3); }
-  
+
+  .author {
+    @apply font-bold text-blue-600;
+  }
+
+  .modal-bg {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
   @media (min-width: 640px) {
     .reply-form form {
       grid-template-columns: repeat(12, 1fr);
       grid-template-rows: 1fr;
-      
     }
-    
+
     .reply-form form textarea {
       display: block;
       width: 100%;
@@ -26,12 +29,12 @@
       grid-row: 1;
       z-index: 10;
     }
-    
+
     .reply-form form div:last-child {
       align-items: flex-start;
       grid-column: 1 / -1;
       grid-row: 1;
-      
+
       button {
         width: 16.666667%;
       }

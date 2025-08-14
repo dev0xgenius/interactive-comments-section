@@ -1,149 +1,153 @@
-import Comments from './Comments'
-import ReplyForm from './ReplyForm'
-import Modal from './Modal'
-import { useEffect, useState, useContext } from 'react'
-import client from '../api/client'
-import { UserContext } from "../utils/contexts/UserContext"
-import { generateID, updateComment } from '../utils/helpers'
-import { elapsedString } from '../utils/time'
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useReducer, useState } from "react";
+import useWebSocket from "../hooks/useWebSocket.js";
+import { UserContext } from "../utils/contexts/UserContext.js";
+import Comments from "./Comments";
+import Modal from "./Modal";
+import ReplyForm from "./ReplyForm.jsx";
 
+import reducer from "../../../shared/utils/reducer.js";
+
+// TODO: Add authentication and replace all 'userID' variables
 export default function App() {
-  const [appData, setAppData] = useState();
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    handleResponse: null
-  });
+	const [data, dispatch] = useReducer(reducer, {
+		currentUser: {
+			image: {
+				png: "./images/avatars/image-juliusomo.png",
+				webp: "./images/avatars/image-juliusomo.webp",
+			},
+			username: "juliusomo",
+		},
+		comments: [],
+	});
 
-  const showModal = () => {
-    return new Promise(resolve => {
-      setModalState(s => ({
-        isOpen: true,
-        handleResponse: resolve,
-      }));
-    });
-  };
+	const [getInitialMessage, sendMessage] = useWebSocket(
+		"ws://localhost:8080/comments",
+		dispatch,
+	);
 
-  const closeModal = () => {
-    setModalState(s => ({
-      isOpen: false,
-      handleResponse: null
-    }));
-  };
+	const {
+		isLoading,
+		data: messages,
+		error,
+	} = useQuery({
+		queryKey: ["comments"],
+		queryFn: getInitialMessage,
+	});
 
-  useEffect(() => {
-    const controller = new AbortController();
-    client.getComments(
-      data => setAppData(currentState => ({ ...data }))
-      , controller);
-  }, []);
+	useEffect(() => {
+		if (!isLoading && !error) {
+			messages.forEach((message) => dispatch(message));
+		}
+	}, [messages, isLoading, error]);
 
-  const addComment = (comment) => {
-    const newComment = {
-      id: generateID(appData.comments),
-      content: comment,
-      score: 0,
-      createdAt: Date.now(),
-      user: appData.currentUser,
-      replies: []
-    };
+	const [modalState, setModalState] = useState({
+		isOpen: false,
+		handleResponse: null,
+	});
 
-    let updatedComments = [...appData.comments, newComment];
-    setAppData(currentState =>
-      Object.assign(
-        {}, currentState, { comments: updatedComments })
-    ); client.addComment(newComment);
-  };
+	if (isLoading) {
+		return (
+			<div className="bg-white rounded-xl font-mono flex justify-center items-center p-8">
+				<p className="text-md">Loading...</p>
+			</div>
+		);
+	} else if (error) {
+		<div>Sorry an unexpected server error occured!!!</div>;
+	}
 
-  const addReply = (reply, commentID) => {
-    let updatedComments = appData.comments.map(comment => {
-      if (comment.id === commentID) {
-        let updatedReplies = comment.replies.concat(reply);
-        return Object.assign({}, comment,
-          { replies: updatedReplies }
-        );
-      }
-      return comment;
-    });
+	const showModal = () => {
+		return new Promise((resolve) => {
+			setModalState(() => ({
+				isOpen: true,
+				handleResponse: resolve,
+			}));
+		});
+	};
 
-    setAppData(currentState => ({ ...currentState,  comments: updatedComments })); 
-    client.addReply(reply, commentID);
-  };
+	const closeModal = () => {
+		setModalState(() => ({
+			isOpen: false,
+			handleResponse: null,
+		}));
+	};
 
-  const deleteReply = async (replyID) => {
-    let userSelection = await showModal();
-    if (userSelection) {
-      closeModal();
-      let updatedComments = appData.comments.filter(comment => {
-        if (comment.replies.length != 0) {
-          comment.replies = comment.replies.filter(
-            reply => reply.id != replyID);
-        }
-            
-        return (comment.id != replyID);
-      });
+	const addComment = (comment) => {
+		const data = {
+			userID: "faeb5f28-8632-4e0b-aaac-f8368f333430",
+			content: comment,
+			score: 0,
+		};
 
-      setAppData(currentData => ({ ...currentData, comments: updatedComments }));
-      client.deleteReply(replyID);
-    } else closeModal();
-  };
+		sendMessage({ type: "ADD_COMMENT", data });
+	};
 
-  const editReply = (editedReply, id) => {
-    let { comments } = appData;
-    let updatedComments = updateComment(comments, id,
-      ["content", editedReply]);
+	const addReply = (reply, commentID) => {
+		reply.userID = "faeb5f28-8632-4e0b-aaac-f8368f333430";
+		reply.commentID = commentID;
 
-    setAppData(currentData => (
-      { ...currentData, comments: updatedComments }
-    )); client.editComment(id, editedReply);
-  };
+		sendMessage({
+			type: "ADD_REPLY",
+			data: reply,
+		});
+	};
 
-  const vote = (count, id) => {
-    const { comments } = appData;
-    const counter = (count, oldVal) =>
-      (oldVal || count > 0) ? (oldVal + (count)) : oldVal;
-      
-    let updatedComments = updateComment(comments, id, 
-      ["score", (comment) => { 
-        let newScore = counter(count, comment.score)
-        client.vote(newScore, id);
-        
-        return newScore;
-      }]
-    );
+	const deleteReply = async (replyID) => {
+		let userSelection = await showModal();
 
-    setAppData(currentData => ({
-      ...currentData, 
-      comments: updatedComments
-    }));
-  };
+		if (userSelection) {
+			closeModal();
+			sendMessage({ type: "DELETE_REPLY", data: { id: replyID } });
+		} else closeModal();
+	};
 
-  return (appData != null) ? (
-    <UserContext.Provider value={appData.currentUser}>
-      <Modal
-        mainMsg="Are you sure you want to remove this comment?
+	const editReply = (editedReply, id) => {
+		sendMessage({ type: "EDIT_REPLY", data: { id, content: editedReply } });
+	};
+
+	const vote = (count, id) => {
+		const counter = (count, oldVal) =>
+			oldVal || count > 0 ? oldVal + count : oldVal;
+
+		let currentScore = 0;
+		data.comments.forEach((comment) => {
+			if (comment.id === id) currentScore = comment.score;
+			else if (comment.replies.length > 0) {
+				comment.replies.forEach((reply) => {
+					currentScore = reply.id === id && reply.score;
+				});
+			}
+		});
+
+		sendMessage({
+			type: "EDIT_REPLY",
+			data: { id, score: counter(count, currentScore) },
+		});
+	};
+
+	return (
+		<UserContext.Provider value={data.currentUser}>
+			<Modal
+				mainMsg="Are you sure you want to remove this comment?
         This will remove the comment and can't be undone"
-        headerMsg="Delete Comment"
-        isOpen={modalState.isOpen}
-        handleResponse={modalState.handleResponse}
-      />
-      <div className="wrapper m-auto w-full max-w-3xl flex flex-col gap-0 px-5 py-2.5">
-        <Comments
-          data={appData.comments}
-          actions={{ addReply, deleteReply, editReply, vote }}
-        />
-        <div className="reply-form bg-white-100 rounded-2xl p-5">
-          <ReplyForm
-            keepOpen={true}
-            placeholder="Add a comment..."
-            user={appData.currentUser}
-            action={addComment}
-          />
-        </div>
-      </div>
-    </UserContext.Provider>
-  ) : (
-    <div className="bg-white rounded-xl font-mono flex justify-center items-center p-8">
-      <p className="text-md">Couldn't Fetch Data...</p>
-    </div>
-  );
-};
+				headerMsg="Delete Comment"
+				isOpen={modalState.isOpen}
+				handleResponse={modalState.handleResponse}
+			/>
+			<div className="wrapper m-auto w-full max-w-3xl flex flex-col gap-0 px-5 py-2.5">
+				<Comments
+					data={data.comments}
+					actions={{ addReply, deleteReply, editReply, vote }}
+				/>
+				<div className="reply-form bg-white-100 rounded-2xl p-5">
+					<ReplyForm
+						keepOpen={true}
+						placeholder="Add a comment..."
+						user={data.currentUser}
+						action={addComment}
+					/>
+				</div>
+			</div>
+		</UserContext.Provider>
+	);
+}

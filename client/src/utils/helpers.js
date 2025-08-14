@@ -1,5 +1,6 @@
 const generateID = (objArray, usedIDs = new Set([])) => {
-  let newID = null; let idExists = false;
+  let newID = null;
+  let idExists = false;
   do {
     newID = Math.floor(Date.now() / 1000);
   } while (usedIDs.has(newID));
@@ -12,40 +13,31 @@ const generateID = (objArray, usedIDs = new Set([])) => {
       usedIDs.add(Number(id));
     }
   }
-  return (idExists) ? generateID(objArray, usedIDs) : newID;
+  return idExists ? generateID(objArray, usedIDs) : newID;
 };
 
 function updateComment(comments, id, [property, value]) {
-  let updatedComments = comments.map(comment => {
+  let updatedComments = [...comments].map((comment) => {
     if (!(property in comment)) return comment;
-    let updatedComment = { ...comment };
 
+    let updatedComment = { ...comment };
     if (comment.id === id) {
-      updatedComment[property] = (typeof value == 'function') ?
-        value(comment) : value;
+      if (typeof value == "function") {
+        return value(comment);
+      }
+
+      updatedComment[property] = value;
+    } else if (comment.id !== id && !comment.replies) return comment;
+
+    if (comment.replies) {
+      let { replies } = comment;
+      updatedComment.replies = updateComment(replies, id, [property, value]);
     }
 
-    else if (comment.id !== id && !comment.replies) return comment;
-    else if (comment.replies) {
-      let { replies } = comment;
-      replies = replies.map(reply => {
-        let updatedReply = { ...reply };
-        if (reply.id === id) {
-          updatedReply[property] = (typeof value == 'function') ?
-            value(reply) : value;
-        }
-
-        return updatedReply;
-      });
-
-      updatedComment.replies = replies;
-    } return updatedComment;
+    return updatedComment;
   });
 
   return updatedComments;
 }
 
-export {
-  generateID,
-  updateComment
-};
+export { generateID, updateComment };

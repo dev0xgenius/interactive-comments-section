@@ -1,7 +1,11 @@
+const db = require("./db");
+const express = require("express");
 const { messageResolver, resolveComment } = require("./lib/messageResolver.js");
 const { ChatServer } = require("./lib/ChatServer");
-const app = express();
 
+const PORT = process.env.PORT || 8080;
+
+const app = express();
 const chat = new ChatServer(
     {
         httpServer: app,
@@ -11,6 +15,8 @@ const chat = new ChatServer(
 
     messageResolver,
 );
+
+app.use(express.static("../client/dist"));
 
 function resolveChatMessages() {
     return new Promise((resolve, reject) => {

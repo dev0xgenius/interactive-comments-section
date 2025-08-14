@@ -4,19 +4,24 @@
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
-        "start": "nodemon index",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "0xG3nius",
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "bcrypt": "^6.0.0",
         "body-parser": "^1.20.3",
         "cors": "^2.8.5",
-        "express": "^4.21.2"
+        "dotenv": "^17.2.0",
+        "express": "^4.21.2",
+        "knex": "^3.1.0",
+        "pg": "^8.16.3",
+        "uuid": "^11.1.0",
+        "vite-express": "^0.20.0",
+        "ws": "^8.18.3"
     },
     "devDependencies": {
-        "nodemon": "^3.1.9",
-        "vitest": "^3.0.8"
+        "nodemon": "^3.1.9"
     }
 }
