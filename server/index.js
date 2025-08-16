@@ -4,16 +4,15 @@ const { messageResolver, resolveComment } = require("./lib/messageResolver.js");
 const { ChatServer } = require("./lib/ChatServer");
 
 const PORT = process.env.PORT || 8080;
-
 const app = express();
+
 const chat = new ChatServer(
     {
         httpServer: app,
-        baseUrl: "ws://localhost:8080",
         path: "/comments",
     },
 
-    messageResolver,
+    messageResolver
 );
 
 app.use(express.static("../client/dist"));
@@ -22,7 +21,7 @@ function resolveChatMessages() {
     return new Promise((resolve, reject) => {
         db.getComments().then((comments) => {
             let resolvedComments = Promise.all(
-                comments.map((comment) => resolveComment(comment)),
+                comments.map((comment) => resolveComment(comment))
             );
 
             resolvedComments.then(resolve).catch(reject);
