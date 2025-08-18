@@ -2,13 +2,13 @@ const path = require("path");
 const uuid = require("uuid");
 const { Pool } = require("pg");
 
-const envPath = path.join(__dirname, "../../.env");
-require("dotenv").config({ path: envPath });
+require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: false,
-    idleTimeoutMillis: 30000,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 pool.on("error", (err, client) => {
