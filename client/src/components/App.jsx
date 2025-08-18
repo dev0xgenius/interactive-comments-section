@@ -28,7 +28,7 @@ export default function App() {
         if (url.protocol == "https:") wsProtocol = "wss";
 
         websocketUrl.current = `${wsProtocol}://${url.hostname}/comments`;
-        console.log(websocketUrl.current);
+        alert(websocketUrl.current);
     }, [websocketUrl]);
 
     const [getInitialMessage, sendMessage] = useWebSocket(
