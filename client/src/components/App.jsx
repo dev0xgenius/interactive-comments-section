@@ -32,7 +32,7 @@ export default function App() {
     }, [websocketUrl]);
 
     const [getInitialMessage, sendMessage] = useWebSocket(
-        "/comments",
+        websocketUrl.current,
         dispatch
     );
 
