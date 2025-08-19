@@ -18,6 +18,7 @@ pool.on("error", (err, client) => {
     );
     process.exit(-1);
 });
+
 const query = async (text, params) => {
     return await pool.query(text, params);
 };
