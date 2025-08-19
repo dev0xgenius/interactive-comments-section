@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import useWebSocket from "../hooks/useWebSocket.js";
 import { UserContext } from "../utils/contexts/UserContext.js";
 import Comments from "./Comments";
@@ -21,15 +21,10 @@ export default function App() {
         comments: [],
     });
 
-    let wsProtocol = useRef("ws");
-    useEffect(() => {
-        if (window.location.protocol === "https:") {
-            wsProtocol.current = "wss";
-        }
-    }, []);
+    let protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
     const [getInitialMessage, sendMessage] = useWebSocket(
-        `${wsProtocol.current}://${window.location.host}/comments`,
+        `${protocol}://${window.location.host}/comments`,
         dispatch
     );
 
