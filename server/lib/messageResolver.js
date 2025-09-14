@@ -1,16 +1,19 @@
 const db = require("../db");
+
 const {
     addComment,
-    addReply,
     deleteReply,
+    addReply,
     editReply,
 } = require("../db/queries");
 
 async function resolveComment(comment) {
+    let resolvedComment;
     try {
         const user = await db.getUser(comment.user_id);
+        if (!user) throw new Error("User doesn't exist!!!");
 
-        comment = {
+        resolvedComment = {
             ...comment,
             user: {
                 image: { png: user.image_url, webp: "" },
@@ -19,69 +22,95 @@ async function resolveComment(comment) {
             createdAt: new Date(comment.created_at).getTime(),
         };
 
-        if ("comment_id" in comment) {
-            comment.commentID = comment.comment_id;
-            comment.replyingTo = comment.replying_to;
+        if ("replying_to" in comment) {
+            resolvedComment.replyingTo = await db.getUsernameFromCommentId(
+                comment.replying_to
+            );
+            resolvedComment.commentID = resolvedComment.replying_to;
         } else {
             let replies = await db.getReplies(comment.id);
-            comment.replies = await Promise.all(
-                replies.map((reply) => resolveComment(reply)),
+
+            resolvedComment.replies = await Promise.all(
+                replies.map((reply) => resolveComment(reply))
             );
         }
     } catch (e) {
-        throw new Error(e);
-    } finally {
-        delete comment.replying_to;
-        delete comment.user_id;
-        delete comment.created_at;
-        delete comment.comment_id;
+        console.log("Resolve Issue: ", e);
+        throw new Error("Error Resolving Comments");
+    }
 
-        return comment;
+    delete resolvedComment.created_at;
+    delete resolvedComment.user_id;
+    delete resolvedComment.replying_to;
+
+    return resolvedComment;
+}
+
+async function handleMessage(
+    getMessage,
+    decode = (message) => message,
+    errMsg = "An error occured while trying to process the message"
+) {
+    try {
+        let message = await Promise.resolve(getMessage());
+        const decodedMessage = await Promise.resolve(decode(message));
+
+        return JSON.stringify(decodedMessage);
+    } catch (error) {
+        console.log(error);
+        throw new Error(errMsg);
     }
 }
 
-function messageResolver(message) {
+class MessageHandler {
+    constructor(decoder, handler) {
+        this.decoder = decoder;
+        this.handler = handler;
+
+        this.cases = new Map();
+    }
+
+    async handle(message) {
+        for (let [type, action] of this.cases) {
+            if (message.type === type) {
+                message.data = await this.handler(
+                    () => action(message.data),
+                    this.decoder
+                );
+            }
+        }
+
+        return JSON.stringify(message);
+    }
+
+    register(caseIdentifier, action) {
+        this.cases.set(caseIdentifier, action);
+    }
+
+    unregister(caseIdentifier) {
+        this.cases.delete(caseIdentifier);
+    }
+}
+
+let chatHandler = new MessageHandler(resolveComment, handleMessage);
+
+chatHandler.register("ADD_COMMENT", addComment);
+chatHandler.register("DELETE_REPLY", deleteReply);
+chatHandler.register("ADD_REPLY", addReply);
+chatHandler.register("EDIT_REPLY", editReply);
+
+async function messageReducer(message) {
     message = JSON.parse(message);
 
     switch (message.type) {
-        case "ADD_COMMENT":
-            return new Promise((resolve, reject) => {
-                addComment(message.data)
-                    .then(resolveComment)
-                    .then((data) => {
-                        message.data = data;
-                        resolve(JSON.stringify(message));
-                    })
-                    .catch(reject);
-            });
-        case "ADD_REPLY":
-            return new Promise((resolve, reject) => {
-                addReply(message.data)
-                    .then(resolveComment)
-                    .then((data) => {
-                        message.data = data;
-                        resolve(JSON.stringify(message));
-                    })
-                    .catch(reject);
-            });
-        case "DELETE_REPLY":
-            return new Promise((resolve, reject) => {
-                deleteReply(message.data).catch(reject);
-                resolve(JSON.stringify(message));
-            });
-        case "EDIT_REPLY":
-            return new Promise((resolve, reject) => [
-                editReply(message.data)
-                    .then(resolveComment)
-                    .then((data) => {
-                        message.data = data;
-                        resolve(JSON.stringify(message));
-                    }),
-            ]);
+        case "chat":
+            return await chatHandler.handle(message.payload);
+        default:
+            console.log("Message could not be resolved");
     }
 }
 
 module.exports = {
-    messageResolver,
+    messageReducer,
     resolveComment,
 };

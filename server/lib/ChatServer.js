@@ -5,11 +5,11 @@ class ChatServer {
     #socket;
     #server;
 
-    constructor({ httpServer, path = "/chat" }, messageResolver) {
+    constructor({ httpServer, messageResolver, path = "/chat" }) {
         this.#socket = new WebSocketServer({ noServer: true });
         this.#server = createServer(httpServer);
-        this.messageResolver = messageResolver;
 
+        this.messageResolver = messageResolver;
         this.messages = [];
 
         this.#server.on("upgrade", (req, socket, head) => {
@@ -24,8 +24,7 @@ class ChatServer {
             }
         });
 
-        this.#server.on("error", (err, client) => {
-            console.log(client);
+        this.#server.on("error", (err) => {
             console.log(err);
         });
     }
@@ -38,13 +37,12 @@ class ChatServer {
 
         client.on("message", (data) => {
             this.broadcastMessage(data, client);
-            this.messages.push(data);
         });
 
         client.on("error", (err) => this.#server.emit("error", err, this));
 
         client.on("close", () => {
-            console.log("connection closed");
+            console.log("Connection Closed");
         });
     }
 
@@ -53,25 +51,23 @@ class ChatServer {
         callback(this.#server);
     }
 
-    broadcastMessage(data, client = undefined) {
-        const onError = (err) => {
-            if (err) this.#server.emit("error", err, client);
-        };
-
+    async broadcastMessage(data, client = undefined) {
         const broadcastToAll = (message) => {
-            for (const client of this.#socket.clients)
-                if (client.readyState === WebSocket.OPEN)
-                    client.send(message, onError);
+            for (const client of this.#socket.clients) {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            }
         };
 
-        this.messageResolver(data)
-            .then((resolvedMessage) => {
-                broadcastToAll(resolvedMessage);
-                this.messages = this.messages.concat(
-                    JSON.parse(resolvedMessage)
-                );
-            })
-            .catch(onError);
+        try {
+            let resolvedMessage = await this.messageResolver(data);
+            broadcastToAll(resolvedMessage);
+
+            this.messages = this.messages.concat(JSON.parse(resolvedMessage));
+        } catch (error) {
+            this.#server.emit("error", error, client);
+        }
     }
 }
 
