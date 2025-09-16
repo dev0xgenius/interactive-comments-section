@@ -61,9 +61,9 @@ async function deleteReply(reply) {
         throw e;
     }
 }
-
 async function editReply(data) {
     let { id } = data;
+
     let column_name = data.content ? "content" : "score";
     let column_value = data.content ? String(data.content) : Number(data.score);
 
@@ -71,13 +71,14 @@ async function editReply(data) {
         let result =
             typeof id == "number"
                 ? await db.query(
-                      `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
+                      `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id,replying_to`,
                       [column_value, id]
                   )
                 : await db.query(
-                      `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id `,
+                      `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
                       [column_value, id]
                   );
+
         return result.rows[0];
     } catch (e) {
         throw e;

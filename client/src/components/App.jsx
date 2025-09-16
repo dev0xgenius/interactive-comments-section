@@ -117,17 +117,12 @@ export default function App() {
             oldVal || count > 0 ? oldVal + count : oldVal;
 
         let currentScore = 0;
-        updateComment(comments, id, [
+        updateComment([...comments], id, [
             "score",
             (matchedComment) => {
                 currentScore = matchedComment.score;
             },
         ]);
-
-        if (!loggedUser) {
-            console.log("Please log in");
-            return;
-        }
 
         sendMessage({
             type: "EDIT_REPLY",

@@ -17,7 +17,6 @@ const generateID = (objArray, usedIDs = new Set([])) => {
 };
 
 function updateComment(comments, id, [property, value]) {
-    console.log("Wagwan");
     let updatedComments = [...comments].map((comment) => {
         let updatedComment = { ...comment };
 

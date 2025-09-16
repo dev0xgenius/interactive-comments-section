@@ -11,8 +11,6 @@ async function resolveComment(comment) {
     let resolvedComment;
     try {
         const user = await db.getUser(comment.user_id);
-        if (!user) throw new Error("User doesn't exist!!!");
-
         resolvedComment = {
             ...comment,
             user: {
