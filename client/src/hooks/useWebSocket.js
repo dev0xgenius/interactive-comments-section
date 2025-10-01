@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export default function useWebSocket(url, handleMessage) {
-    let initialMessage = useRef(null);
+    let messages = useRef(null);
     let messageHandler = useRef((data) =>
         console.log(
             "Nothing to do with ",
@@ -10,17 +10,17 @@ export default function useWebSocket(url, handleMessage) {
         )
     );
 
-    const getInitialMessage = () => {
+    const loadMessages = () => {
         return new Promise((resolve, reject) => {
             let t = setInterval(() => {
-                if (initialMessage.current != null) {
+                if (messages.current != null) {
                     clearInterval(t);
-                    resolve(initialMessage.current);
+                    resolve(messages.current);
                 }
             }, 500);
 
             setTimeout(() => {
-                if (initialMessage.current) {
+                if (messages.current) {
                     clearInterval(t);
                     return;
                 }
@@ -36,20 +36,26 @@ export default function useWebSocket(url, handleMessage) {
 
         websocket.onopen = () => {
             messageHandler.current = (data) => {
-                if (typeof data == "string") websocket.send(data);
-                else websocket.send(JSON.stringify(data));
+                data = {
+                    type: "chat",
+                    payload: data,
+                    timestamp: Date.now(),
+                };
+
+                websocket.send(JSON.stringify(data));
             };
         };
 
         websocket.addEventListener(
             "message",
             (event) => {
-                if (event.data != undefined)
-                    initialMessage.current = JSON.parse(event.data);
+                if (event.data != undefined) {
+                    messages.current = JSON.parse(event.data);
+                }
 
                 websocket.addEventListener("message", (event) => {
                     const { data } = event;
-                    handleMessage(JSON.parse(data));
+                    if (data) handleMessage(JSON.parse(data));
                 });
             },
             { once: true }
@@ -62,7 +68,7 @@ export default function useWebSocket(url, handleMessage) {
         return () => {
             websocket.close();
         };
-    }, [initialMessage, handleMessage, url]);
+    }, [messages, handleMessage, url]);
 
-    return [getInitialMessage, messageHandler.current];
+    return [loadMessages, messageHandler.current];
 }
