@@ -34,7 +34,7 @@ export default function App() {
         }
     }, [messages, isLoading, error]);
 
-    const { data: loggedUser } = useQuery({
+    let { data: loggedUser } = useQuery({
         queryKey: ["user"],
         queryFn: async () => {
             const response = await fetch("/auth", { method: "POST" });
@@ -160,7 +160,11 @@ export default function App() {
                         />
                     </div>
                 ) : (
-                    <Auth />
+                    <Auth
+                        onAuthSuccess={(authenticatedUser) =>
+                            (loggedUser = authenticatedUser)
+                        }
+                    />
                 )}
             </div>
         </UserContext.Provider>
