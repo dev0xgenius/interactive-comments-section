@@ -2,7 +2,7 @@ const db = require("../db");
 
 const {
     addComment,
-    deleteReply,
+    handleDelete,
     addReply,
     editReply,
 } = require("../db/queries");
@@ -93,7 +93,7 @@ class MessageHandler {
 let chatHandler = new MessageHandler(resolveComment, handleMessage);
 
 chatHandler.register("ADD_COMMENT", addComment);
-chatHandler.register("DELETE_REPLY", deleteReply);
+chatHandler.register("DELETE_REPLY", handleDelete);
 chatHandler.register("ADD_REPLY", addReply);
 chatHandler.register("EDIT_REPLY", editReply);
 

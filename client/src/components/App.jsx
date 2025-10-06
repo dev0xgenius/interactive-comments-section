@@ -147,6 +147,7 @@ export default function App() {
                 ) : (
                     <Comments
                         data={comments}
+                        // TODO: fix deleteReply action
                         actions={{ addReply, deleteReply, editReply, vote }}
                     />
                 )}

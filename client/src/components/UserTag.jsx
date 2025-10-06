@@ -8,7 +8,11 @@ export default function UserTag({ user }) {
     return (
         <span className="user flex gap-4 items-center">
             <span className="inline-block w-8 h-8">
-                <img src={user.image.png} width="100%" height="auto" />
+                <img
+                    src={user.image.png || "images/avatars/image-amyrobson.png"}
+                    width="100%"
+                    height="auto"
+                />
             </span>
             <span className="flex gap-2 justify-center items-center">
                 <span className="author">{user.username}</span>
