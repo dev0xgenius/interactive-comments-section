@@ -9,6 +9,7 @@ import ReplyForm from "./ReplyForm.jsx";
 import reducer from "../../../shared/utils/reducer.js";
 import { updateComment } from "../utils/helpers.js";
 import Auth from "./Auth.jsx";
+import LoadingSkeleton from "./LoadingSkeleton.jsx";
 
 export default function App() {
     const [comments, dispatch] = useReducer(reducer, []);
@@ -25,7 +26,11 @@ export default function App() {
         error,
     } = useQuery({
         queryKey: ["comments"],
-        queryFn: loadMessages,
+        queryFn: async () => {
+            // TODO: Remove pause
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            return loadMessages();
+        },
     });
 
     useEffect(() => {
@@ -54,11 +59,7 @@ export default function App() {
     });
 
     if (isLoading) {
-        return (
-            <div className="bg-white rounded-xl font-mono flex justify-center items-center p-8">
-                <p className="text-md">Loading...</p>
-            </div>
-        );
+        return <LoadingSkeleton />;
     } else if (error) {
         <div>Sorry an unexpected server error occured!!!</div>;
     }
@@ -147,7 +148,6 @@ export default function App() {
                 ) : (
                     <Comments
                         data={comments}
-                        // TODO: fix deleteReply action
                         actions={{ addReply, deleteReply, editReply, vote }}
                     />
                 )}

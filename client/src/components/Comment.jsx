@@ -183,6 +183,7 @@ const commentPropTypes = PropTypes.shape({
             png: PropTypes.string,
             webp: PropTypes.string,
         }),
+
         username: PropTypes.string,
     }).isRequired,
 

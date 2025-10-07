@@ -50,6 +50,7 @@ Comments.propTypes = {
         deleteReply: PropTypes.func,
         vote: PropTypes.func,
     }).isRequired,
+
     data: PropTypes.arrayOf(
         PropTypes.shape({
             id: PropTypes.number.isRequired,
