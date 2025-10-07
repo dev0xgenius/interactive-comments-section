@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import PropTypes from "prop-types";
 import { z } from "zod";
 
 function Input(props) {
@@ -18,8 +19,12 @@ const formSchema = z.object({
     password: z.string(),
 });
 
-export default function Auth() {
-    const mutation = useMutation({
+function AuthForm({ onAuthSuccess }) {
+    const {
+        data,
+        error: authFailed,
+        mutate,
+    } = useMutation({
         mutationFn: async (data) => {
             const requestUrl = "/auth";
             const request = new Request(requestUrl, {
@@ -31,19 +36,18 @@ export default function Auth() {
             const response = await fetch(request);
             switch (response.status) {
                 case 400:
-                    console.log("400", response.statusText);
-                    break;
+                    throw new Error(await response.text());
                 case 401:
-                    console.log(response.statusText);
                     return { signUp: true };
                 case 403:
-                    console.log("invalid credentials");
-                    break;
+                    throw new Error("Invalid Credentials...");
                 default:
                     console.log(response.status);
             }
 
-            console.log(await response.json());
+            let authenticatedUser = await response.json();
+            onAuthSuccess(authenticatedUser);
+
             return {};
         },
     });
@@ -61,12 +65,18 @@ export default function Auth() {
             return;
         }
 
-        mutation.mutate(serializedData);
+        mutate(serializedData);
     };
 
     return (
         <div className="bg-white-100 rounded-md p-8 mt-8 m-auto w-max max-w-full">
             <div className="container w-full relative">
+                {authFailed && (
+                    <div className="text-sm py-2 text-red-500">
+                        {authFailed.message}
+                    </div>
+                )}
+
                 <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                     <h3 className="font-bold text-blue-700">
                         {"Sign Up/Log In"}
@@ -78,7 +88,7 @@ export default function Auth() {
                             placeholder="Enter Password"
                             name="password"
                         />
-                        {mutation?.data?.signUp && (
+                        {data?.signUp && (
                             <Input
                                 type="password"
                                 placeholder="Confirm Password"
@@ -94,3 +104,15 @@ export default function Auth() {
         </div>
     );
 }
+
+export default function Auth({ onAuthSuccess }) {
+    return <AuthForm onAuthSuccess={onAuthSuccess} />;
+}
+
+Auth.propTypes = {
+    onAuthSuccess: PropTypes.func,
+};
+
+AuthForm.propTypes = {
+    onAuthSuccess: PropTypes.func,
+};

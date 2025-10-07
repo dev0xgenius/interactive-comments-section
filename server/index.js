@@ -22,7 +22,6 @@ app.use(express.static("../client/dist"));
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
-
 app.use(authRouter);
 
 async function getChatMessages() {

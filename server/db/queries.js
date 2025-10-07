@@ -36,31 +36,66 @@ async function addReply(reply) {
             result.replying_to
         );
 
+        result.replyingTo = `${result.replyingTo}, ${replyingTo}`;
+        console.log(result.replyingTo);
+
         return result;
     } catch (e) {
         throw e;
     }
 }
 
-async function deleteReply(reply) {
-    let { id } = reply;
-    try {
-        const deletedReply =
-            typeof id == "number"
-                ? await db.query(
-                      "DELETE FROM replies WHERE id=$1 RETURNING *",
-                      [id]
-                  )
-                : await db.query(
-                      "DELETE FROM comments WHERE id=$1 RETURNING *",
-                      [id]
-                  );
+function handleDelete({ id }) {
+    return typeof id == "number" ? deleteReply(id) : deleteComment(id);
+}
 
-        return deletedReply.rows[0];
+async function repliesExist(commentID) {
+    let result = await db.query(
+        "SELECT COUNT(*) FROM replies WHERE replying_to=$1",
+        [commentID]
+    );
+
+    return !!result.rows[0];
+}
+
+async function deleteComment(id) {
+    try {
+        repliesExist(id) && (await deleteReplies(id));
+        const deletedComment = await db.query(
+            "DELETE FROM comments WHERE id=$1 RETURNING *",
+            [id]
+        );
+
+        return deletedComment.rows[0];
     } catch (e) {
+        console.log("FAILED TO DELETE COMMENT");
         throw e;
     }
 }
+
+async function deleteReplies(commentID) {
+    try {
+        await db.query("DELETE FROM replies WHERE replying_to=$1", [commentID]);
+    } catch (e) {
+        console.log("FAILED TO DELETE REPLIES ON COMMENT: ", commentID);
+        throw e;
+    }
+}
+
+async function deleteReply(id) {
+    try {
+        const deletedReply = await db.query(
+            "DELETE FROM replies WHERE id=$1 RETURNING *",
+            [id]
+        );
+
+        return deletedReply.rows[0];
+    } catch (e) {
+        console.log("FAILED TO DELETE REPLY");
+        throw e;
+    }
+}
+
 async function editReply(data) {
     let { id } = data;
 
@@ -89,5 +124,6 @@ module.exports = {
     addComment,
     addReply,
     deleteReply,
+    handleDelete,
     editReply,
 };
