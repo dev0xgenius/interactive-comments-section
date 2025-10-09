@@ -8,6 +8,11 @@ async function handleAuthentication(req, res) {
     const { username, password, confirmedPassword } = req?.body;
     if (!username || !password) return res.status(400).end("Missing fields");
 
+    if (confirmedPassword && confirmedPassword !== password) {
+        console.log("Password does not match");
+        return res.status(400).end("password does not match");
+    }
+
     let foundUser;
     try {
         foundUser = await db.query(
