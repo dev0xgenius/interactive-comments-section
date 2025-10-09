@@ -10,6 +10,8 @@ const { authRouter } = require("./routes/auth.js");
 const PORT = process.env.PORT || 8080;
 const app = express();
 
+// TODO: Implement ping and pong requests for monitoring clients
+
 const chat = new ChatServer({
     httpServer: app,
     path: "/comments",
