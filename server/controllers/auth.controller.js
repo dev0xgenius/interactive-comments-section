@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const db = require("../db");
 
 async function handleAuthentication(req, res) {
-    if (req.user) return res.json(req.user);
+    if (req.user) return res.status(200).json(req.user);
 
     const { username, password, confirmedPassword } = req?.body;
     if (!username || !password) return res.status(400).end("Missing fields");
@@ -17,7 +17,7 @@ async function handleAuthentication(req, res) {
     try {
         foundUser = await db.query(
             "SELECT id,password_hash,username,image_url FROM users WHERE username=$1",
-            [username]
+            [username],
         );
 
         foundUser = foundUser.rows[0];
@@ -34,7 +34,7 @@ async function handleAuthentication(req, res) {
 
     const passwordMatched = await bcrypt.compare(
         password,
-        foundUser.password_hash
+        foundUser.password_hash,
     );
 
     if (!passwordMatched) return res.status(403).end("Invalid Credentials");
@@ -56,11 +56,11 @@ async function signIn(req, res) {
     const refreshToken = jwt.sign(
         payload,
         process.env.JWT_SECRET_KEY,
-        jwtOptions
+        jwtOptions,
     );
 
     try {
-        await db.query("INSERT INTO auth(username, token) VALUES($1,$2)", [
+        await db.query("INSERT INTO auth.auth(username, token) VALUES($1,$2)", [
             username,
             refreshToken,
         ]);
@@ -89,15 +89,15 @@ async function signUp(req, res) {
     let newUser;
     try {
         newUser = await db.query(
-            "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3)",
-            [username, hashedPassword, ""]
+            "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
+            [username, hashedPassword, ""],
         );
     } catch (e) {
         console.log(e);
         return res.status(500).end("Server failure");
     }
 
-    res.end();
+    return res.status(204).end("Account created successfully");
 }
 
 module.exports = {

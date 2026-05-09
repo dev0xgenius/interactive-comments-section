@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { z } from "zod";
@@ -20,6 +21,10 @@ const formSchema = z.object({
 });
 
 function AuthForm({ onAuthSuccess }) {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmedPassword, setConfirmedPassword] = useState("");
+
     const {
         data,
         error: authFailed,
@@ -45,10 +50,12 @@ function AuthForm({ onAuthSuccess }) {
                     console.log(response.status);
             }
 
-            let authenticatedUser = await response.json();
-            onAuthSuccess(authenticatedUser);
+            if (response.status == 200) {
+                let authenticatedUser = await response.json();
+                onAuthSuccess(authenticatedUser);
+            }
 
-            return {};
+            return;
         },
     });
 
@@ -69,7 +76,7 @@ function AuthForm({ onAuthSuccess }) {
     };
 
     return (
-        <div className="bg-white-100 rounded-md p-8 mt-8 m-auto w-max max-w-full">
+        <div className="bg-white-100 rounded-2xl p-8 mt-8 m-auto w-max max-w-full">
             <div className="container w-full relative">
                 {authFailed && (
                     <div className="text-sm py-2 text-red-500">
@@ -82,17 +89,34 @@ function AuthForm({ onAuthSuccess }) {
                         {"Sign Up/Log In"}
                     </h3>
                     <main className="flex flex-wrap gap-2 w-full">
-                        <Input placeholder="@johndoe" name="username" />
+                        <Input
+                            placeholder="@johndoe"
+                            name="username"
+                            value={username}
+                            onChange={(evt) =>
+                                setUsername(evt.currentTarget.value)
+                            }
+                        />
                         <Input
                             type="password"
                             placeholder="Enter Password"
                             name="password"
+                            onChange={(evt) =>
+                                setPassword(evt.currentTarget.value)
+                            }
+                            value={password}
                         />
                         {data?.signUp && (
                             <Input
                                 type="password"
                                 placeholder="Confirm Password"
                                 name="confirmedPassword"
+                                onChange={(evt) =>
+                                    setConfirmedPassword(
+                                        evt.currentTarget.value,
+                                    )
+                                }
+                                value={confirmedPassword}
                             />
                         )}
                     </main>

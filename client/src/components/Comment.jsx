@@ -11,7 +11,16 @@ import UserTag from "./UserTag.jsx";
 export default function Comment(props) {
     const loggedUser = useContext(UserContext);
     const [editForm, setEditForm] = useState(false);
-    const [formState, setFormState] = useState({
+    const [editFormState, setEditFormState] = useState({
+        isOpen: false,
+        action: () => {},
+        actionText: "",
+        placeholder: "",
+        content: "",
+        user: { username: "" },
+    });
+
+    const [replyFormState, setReplyFormSTate] = useState({
         isOpen: false,
         action: () => {},
         actionText: "",
@@ -22,11 +31,12 @@ export default function Comment(props) {
 
     const upVote = () => props.actions.vote(1, props.id);
     const downVote = () => props.actions.vote(-1, props.id);
-    const openForm = () => setFormState((fs) => ({ ...fs, isOpen: true }));
-    const closeForm = () => setFormState((fs) => ({ ...fs, isOpen: false }));
+    const openForm = () => setReplyFormSTate((fs) => ({ ...fs, isOpen: true }));
+    const closeForm = () =>
+        setReplyFormSTate((fs) => ({ ...fs, isOpen: false }));
 
     const toggleForm = () => {
-        let formOpen = formState.isOpen;
+        let formOpen = replyFormState.isOpen;
         formOpen ? closeForm() : openForm();
     };
 
@@ -47,7 +57,7 @@ export default function Comment(props) {
             if (replyText)
                 props.actions.addReply(newReply, props.commentID || props.id);
         },
-        [props]
+        [props],
     );
 
     const deleteReply = () => props.actions.deleteReply(props.id);
@@ -67,7 +77,7 @@ export default function Comment(props) {
         if (props.replyingTo)
             content = `@${props.replyingTo}, ${content.trim()}`;
 
-        setFormState((fs) => ({
+        setEditFormState((fs) => ({
             ...fs,
             isOpen: !editForm,
             actionText: "UPDATE",
@@ -88,7 +98,7 @@ export default function Comment(props) {
     );
 
     useEffect(() => {
-        setFormState((fs) => ({
+        setReplyFormSTate((fs) => ({
             ...fs,
             user: loggedUser,
             content: `@${props.user.username}, `,
@@ -113,19 +123,19 @@ export default function Comment(props) {
                         <main className="w-full">
                             {editForm ? (
                                 <ReplyForm
-                                    keepOpen={formState.isOpen}
-                                    action={formState.action}
-                                    content={formState.content}
-                                    placeholder={formState.placeholder}
-                                    actionText={formState.actionText}
-                                    user={formState.user}
+                                    keepOpen={editFormState.isOpen}
+                                    action={editFormState.action}
+                                    content={editFormState.content}
+                                    placeholder={editFormState.placeholder}
+                                    actionText={editFormState.actionText}
+                                    user={editFormState.user}
                                 />
                             ) : (
                                 <p className="text-blue-500 overflow-x-auto">
                                     {props.replyingTo
                                         ? contentJSX(
                                               props.replyingTo,
-                                              props.content
+                                              props.content,
                                           )
                                         : props.content}
                                 </p>
@@ -142,29 +152,29 @@ export default function Comment(props) {
                             <UserOptions
                                 user={props.user}
                                 toggleForm={toggleForm}
-                                actions={{ deleteReply, editReply }}
+                                actions={{ deleteReply, editReply, toggleForm }}
                             />
                         </div>
                     </footer>
                 </div>
             </div>
-            {!loggedUser || loggedUser?.username === props.user.username ? (
+            {!loggedUser ? (
                 <></>
             ) : (
                 <div
                     className={
-                        formState.isOpen
+                        replyFormState.isOpen
                             ? "reply-form bg-white-100 rounded-2xl p-5 w-full"
                             : "hidden"
                     }
                 >
                     <ReplyForm
-                        keepOpen={formState.isOpen}
-                        action={formState.action}
-                        content={formState.content}
-                        placeholder={formState.placeholder}
-                        actionText={formState.actionText}
-                        user={formState.user}
+                        keepOpen={replyFormState.isOpen}
+                        action={replyFormState.action}
+                        content={replyFormState.content}
+                        placeholder={replyFormState.placeholder}
+                        actionText={replyFormState.actionText}
+                        user={replyFormState.user}
                     />
                 </div>
             )}

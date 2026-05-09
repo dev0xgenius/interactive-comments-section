@@ -11,7 +11,7 @@ export default function ReplyForm(props) {
     };
 
     return props.keepOpen ? (
-        <form className="grid gap-4" onSubmit={submitReply}>
+        <form className="grid gap-4 sticky bottom-0" onSubmit={submitReply}>
             <textarea
                 name="content"
                 className="rounded-xl w-full border px-5 py-2.5 
@@ -20,7 +20,7 @@ export default function ReplyForm(props) {
                 placeholder={props.placeholder || "Reply..."}
                 defaultValue={props.content}
             ></textarea>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between gap-4 items-center">
                 <span className="inline-block w-8">
                     {props.user.image ? (
                         <img

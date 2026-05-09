@@ -29,12 +29,12 @@ async function getChatMessages() {
     try {
         comments = await db.getComments();
         comments = await Promise.all(
-            comments.map((comment) => resolveComment(comment))
+            comments.map((comment) => resolveComment(comment)),
         );
 
         return comments;
     } catch (error) {
-        console.log(error);
+        console.log("Internal Error: ", error);
         throw new Error("Couldn't Fetch Messages");
     }
 }
@@ -50,4 +50,6 @@ function startServer(messages) {
     });
 }
 
-getChatMessages().then(startServer);
+getChatMessages()
+    .then(startServer)
+    .catch((err) => console.log(err));

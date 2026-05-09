@@ -7,7 +7,7 @@ async function refreshWithToken(req, res, next) {
 
     let foundUser;
     try {
-        foundUser = await db.query("SELECT * FROM auth WHERE token=$1", [
+        foundUser = await db.query("SELECT * FROM auth.auth WHERE token=$1", [
             refreshToken,
         ]);
 

@@ -17,33 +17,30 @@ export default function App() {
     let protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const [loadMessages, sendMessage] = useWebSocket(
         `${protocol}://${window.location.host}/comments`,
-        dispatch
+        dispatch,
     );
 
     const {
-        isLoading,
+        isLoading: messagesLoading,
         data: messages,
         error,
     } = useQuery({
         queryKey: ["comments"],
         queryFn: async () => {
-            // TODO: Remove pause
-            await new Promise((resolve) => setTimeout(resolve, 3000));
             return loadMessages();
         },
     });
 
     useEffect(() => {
-        if (!isLoading && !error) {
+        if (!messagesLoading && !error) {
             messages.forEach((message) => dispatch(message));
         }
-    }, [messages, isLoading, error]);
+    }, [messages, messagesLoading, error]);
 
-    let { data: loggedUser } = useQuery({
+    let { data: authenticatedUser } = useQuery({
         queryKey: ["user"],
         queryFn: async () => {
             const response = await fetch("/auth", { method: "POST" });
-
             if (response.status != 200) {
                 console.log("Couldn't authenticate user");
                 throw "Couldn't authenticate user";
@@ -51,14 +48,20 @@ export default function App() {
 
             return await response.json();
         },
+        retry: 2,
     });
+
+    const [user, setUser] = useState(undefined);
+    useEffect(() => {
+        if (authenticatedUser) setUser(authenticatedUser);
+    }, [authenticatedUser]);
 
     const [modalState, setModalState] = useState({
         isOpen: false,
         handleResponse: null,
     });
 
-    if (isLoading) {
+    if (messagesLoading) {
         return <LoadingSkeleton />;
     } else if (error) {
         <div>Sorry an unexpected server error occured!!!</div>;
@@ -82,7 +85,7 @@ export default function App() {
 
     const addComment = (comment) => {
         const data = {
-            userID: loggedUser.id,
+            userID: user.id,
             content: comment,
             score: 0,
         };
@@ -91,7 +94,7 @@ export default function App() {
     };
 
     const addReply = (reply, commentID) => {
-        reply.userID = loggedUser.id;
+        reply.userID = user.id;
         reply.commentID = commentID;
 
         sendMessage({
@@ -132,7 +135,7 @@ export default function App() {
     };
 
     return (
-        <UserContext.Provider value={loggedUser}>
+        <UserContext.Provider value={user}>
             <Modal
                 mainMsg="Are you sure you want to remove this comment?
                 This will remove the comment and can't be undone"
@@ -140,33 +143,35 @@ export default function App() {
                 isOpen={modalState.isOpen}
                 handleResponse={modalState.handleResponse}
             />
-            <div className="wrapper m-auto w-full max-w-3xl flex flex-col gap-0 px-5 py-2.5 items-center">
-                {comments?.length == 0 ? (
-                    <span className="bg-white-100 px-8 py-4 my-6 rounded-md text-gray-400">
-                        {"Be the first to say something"}
-                    </span>
-                ) : (
-                    <Comments
-                        data={comments}
-                        actions={{ addReply, deleteReply, editReply, vote }}
-                    />
-                )}
-                {loggedUser ? (
-                    <div className="reply-form w-full bg-white-100 rounded-2xl p-5">
-                        <ReplyForm
-                            keepOpen={true}
-                            placeholder="Add a comment..."
-                            user={loggedUser}
-                            action={addComment}
+            <div className="min-h-screen w-full m-auto flex items-center justify-center max-w-screen-md px-5 py-2.5">
+                <div className="w-full flex flex-col gap-4 items-center justify-center">
+                    {comments?.length == 0 ? (
+                        <span className="font-extrabold tracking-tighter md:text-7xl text-4xl px-8 py-4 my-6 rounded-md text-gray-400">
+                            {"Be the first to say something"}
+                        </span>
+                    ) : (
+                        <Comments
+                            data={comments}
+                            actions={{ addReply, deleteReply, editReply, vote }}
                         />
-                    </div>
-                ) : (
-                    <Auth
-                        onAuthSuccess={(authenticatedUser) =>
-                            (loggedUser = authenticatedUser)
-                        }
-                    />
-                )}
+                    )}
+                    {user ? (
+                        <div className="reply-form w-full bg-white-100 rounded-2xl p-5">
+                            <ReplyForm
+                                keepOpen={true}
+                                placeholder="Add a comment..."
+                                user={user}
+                                action={addComment}
+                            />
+                        </div>
+                    ) : (
+                        <Auth
+                            onAuthSuccess={(authenticatedUser) =>
+                                setUser(authenticatedUser)
+                            }
+                        />
+                    )}
+                </div>
             </div>
         </UserContext.Provider>
     );
