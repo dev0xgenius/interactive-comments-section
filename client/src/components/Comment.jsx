@@ -151,7 +151,6 @@ export default function Comment(props) {
                             />
                             <UserOptions
                                 user={props.user}
-                                toggleForm={toggleForm}
                                 actions={{ deleteReply, editReply, toggleForm }}
                             />
                         </div>

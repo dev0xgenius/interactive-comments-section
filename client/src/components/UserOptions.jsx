@@ -35,7 +35,7 @@ export default function UserOptions(props) {
             </button>
             <button
                 className="flex items-center gap-2 hover:opacity-80"
-                onClick={props.toggleForm}
+                onClick={props.actions.toggleForm}
             >
                 <i className="max-w-4 w-full">
                     <img
@@ -50,7 +50,7 @@ export default function UserOptions(props) {
     ) : (
         <button
             className="flex items-center gap-2 hover:opacity-80"
-            onClick={props.toggleForm}
+            onClick={props.actions.toggleForm}
         >
             <i className="max-w-4 w-full">
                 <img
@@ -72,10 +72,10 @@ UserOptions.propTypes = {
         }),
     }),
 
-    toggleForm: PropTypes.func,
     actions: PropTypes.shape({
         addReply: PropTypes.func,
         deleteReply: PropTypes.func,
         editReply: PropTypes.func,
+        toggleForm: PropTypes.func,
     }),
 };
