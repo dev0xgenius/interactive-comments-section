@@ -17,19 +17,16 @@ export default function Comments(props) {
                     replies={comment.replies}
                     actions={props.actions}
                 />
-                <div
-                    className={
-                        comment.replies.length
-                            ? "sm:pl-12 sm:mt-6 my-5"
-                            : "hidden"
-                    }
-                >
-                    <Replies
-                        replies={comment?.replies}
-                        actions={props.actions}
-                        targetUser={comment.user.username}
-                    />
-                </div>
+
+                {comment.replies.length > 0 && (
+                    <div className="sm:pl-12 sm:mt-6 my-5">
+                        <Replies
+                            replies={comment?.replies}
+                            actions={props.actions}
+                            targetUser={comment.user.username}
+                        />
+                    </div>
+                )}
             </li>
         );
     });
@@ -53,14 +50,14 @@ Comments.propTypes = {
 
     data: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number.isRequired,
+            id: PropTypes.string.isRequired,
             content: PropTypes.string.isRequired,
             createdAt: PropTypes.number.isRequired,
             score: PropTypes.number.isRequired,
 
             replies: PropTypes.arrayOf(
                 PropTypes.shape({
-                    id: PropTypes.number.isRequired,
+                    id: PropTypes.string.isRequired,
                     content: PropTypes.string.isRequired,
                     createdAt: PropTypes.number.isRequired,
                     score: PropTypes.number.isRequired,
@@ -73,7 +70,7 @@ Comments.propTypes = {
                         }),
                         username: PropTypes.string,
                     }).isRequired,
-                })
+                }),
             ),
 
             user: PropTypes.shape({
@@ -83,6 +80,6 @@ Comments.propTypes = {
                 }),
                 username: PropTypes.string,
             }).isRequired,
-        })
+        }),
     ),
 };

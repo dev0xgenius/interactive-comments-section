@@ -2,14 +2,15 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { z } from "zod";
+import FileInput from "./FileInput";
 
 function Input(props) {
     return (
         <span className="border-2 p-2 rounded-md focus-within:border-black focus-within:border flex-grow">
             <input
                 type="text"
-                {...props}
                 className="outline-none border-none"
+                {...props}
             />
         </span>
     );
@@ -53,6 +54,8 @@ function AuthForm({ onAuthSuccess }) {
             if (response.status == 200) {
                 let authenticatedUser = await response.json();
                 onAuthSuccess(authenticatedUser);
+            } else if (response.status == 204) {
+                console.log("User logged in successfully");
             }
 
             return;
@@ -76,51 +79,62 @@ function AuthForm({ onAuthSuccess }) {
     };
 
     return (
-        <div className="bg-white-100 rounded-2xl p-8 mt-8 m-auto w-max max-w-full">
+        <div className="bg-white-100 self-end rounded-2xl p-8 mt-8 w-full md:w-max max-w-full">
             <div className="container w-full relative">
                 {authFailed && (
-                    <div className="text-sm py-2 text-red-500">
+                    <div className={"text-sm py-2 text-red-500"}>
                         {authFailed.message}
                     </div>
                 )}
 
-                <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                <form
+                    className="flex flex-col gap-6 max-w-lg"
+                    onSubmit={handleSubmit}
+                >
                     <h3 className="font-bold text-blue-700">
                         {"Sign Up/Log In"}
                     </h3>
-                    <main className="flex flex-wrap gap-2 w-full">
-                        <Input
-                            placeholder="@johndoe"
-                            name="username"
-                            value={username}
-                            onChange={(evt) =>
-                                setUsername(evt.currentTarget.value)
-                            }
-                        />
-                        <Input
-                            type="password"
-                            placeholder="Enter Password"
-                            name="password"
-                            onChange={(evt) =>
-                                setPassword(evt.currentTarget.value)
-                            }
-                            value={password}
-                        />
-                        {data?.signUp && (
+                    <main className="flex flex-wrap gap-4 items-center w-full">
+                        <div className="flex flex-wrap gap-2 w-full">
+                            <Input
+                                placeholder="@johndoe"
+                                name="username"
+                                value={username}
+                                onChange={(evt) =>
+                                    setUsername(evt.currentTarget.value)
+                                }
+                            />
                             <Input
                                 type="password"
-                                placeholder="Confirm Password"
-                                name="confirmedPassword"
+                                placeholder="Enter Password"
+                                name="password"
                                 onChange={(evt) =>
-                                    setConfirmedPassword(
-                                        evt.currentTarget.value,
-                                    )
+                                    setPassword(evt.currentTarget.value)
                                 }
-                                value={confirmedPassword}
+                                value={password}
                             />
+                        </div>
+                        {data?.signUp && (
+                            <div className="flex md:flex-nowrap flex-wrap items-center justify-center gap-2">
+                                <Input
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    name="confirmedPassword"
+                                    onChange={(evt) =>
+                                        setConfirmedPassword(
+                                            evt.currentTarget.value,
+                                        )
+                                    }
+                                    value={confirmedPassword}
+                                />
+                                <FileInput />
+                            </div>
                         )}
                     </main>
-                    <button className="bg-blue-700 p-4 rounded-md text-white-100 font-semibold">
+                    <button
+                        type="submit"
+                        className="bg-blue-700 p-4 rounded-md text-white-100 font-semibold"
+                    >
                         Sign Up/Login
                     </button>
                 </form>

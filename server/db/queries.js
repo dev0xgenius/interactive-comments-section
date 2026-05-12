@@ -5,7 +5,7 @@ async function addComment(comment) {
     try {
         let result = await db.query(
             "INSERT INTO comments(user_id,content,score) VALUES($1,$2,$3) RETURNING *",
-            [userID, content, score]
+            [userID, content, score],
         );
         return result.rows[0];
     } catch (e) {
@@ -28,17 +28,15 @@ async function addReply(reply) {
                 reply.commentID,
                 reply.content,
                 reply.score,
-            ]
+            ],
         );
 
         result = result.rows[0];
         result.replyingTo = await db.getUsernameFromCommentId(
-            result.replying_to
+            result.replying_to,
         );
 
         result.replyingTo = `${result.replyingTo}, ${replyingTo}`;
-        console.log(result.replyingTo);
-
         return result;
     } catch (e) {
         throw e;
@@ -52,7 +50,7 @@ function handleDelete({ id }) {
 async function repliesExist(commentID) {
     let result = await db.query(
         "SELECT COUNT(*) FROM replies WHERE replying_to=$1",
-        [commentID]
+        [commentID],
     );
 
     return !!result.rows[0];
@@ -63,7 +61,7 @@ async function deleteComment(id) {
         repliesExist(id) && (await deleteReplies(id));
         const deletedComment = await db.query(
             "DELETE FROM comments WHERE id=$1 RETURNING *",
-            [id]
+            [id],
         );
 
         return deletedComment.rows[0];
@@ -86,7 +84,7 @@ async function deleteReply(id) {
     try {
         const deletedReply = await db.query(
             "DELETE FROM replies WHERE id=$1 RETURNING *",
-            [id]
+            [id],
         );
 
         return deletedReply.rows[0];
@@ -107,11 +105,11 @@ async function editReply(data) {
             typeof id == "number"
                 ? await db.query(
                       `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id,replying_to`,
-                      [column_value, id]
+                      [column_value, id],
                   )
                 : await db.query(
                       `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
-                      [column_value, id]
+                      [column_value, id],
                   );
 
         return result.rows[0];

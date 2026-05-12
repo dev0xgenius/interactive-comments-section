@@ -59,7 +59,7 @@ ReplyForm.propTypes = {
     user: PropTypes.shape({
         image: PropTypes.shape({
             png: PropTypes.string.isRequired,
-            webp: PropTypes.string.isRequired,
+            webp: PropTypes.string,
         }),
         username: PropTypes.string.isRequired,
     }),

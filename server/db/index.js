@@ -60,7 +60,13 @@ const getReplies = (commentId) => {
             );
 
         pool.query(`SELECT * FROM replies WHERE replying_to=$1`, [commentId])
-            .then((data) => resolve(data.rows))
+            .then((data) => {
+                data.rows = data.rows.map((row) => ({
+                    ...row,
+                    id: row.id.toString(),
+                }));
+                resolve(data.rows);
+            })
             .catch(reject);
     });
 };

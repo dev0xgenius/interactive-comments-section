@@ -8,6 +8,8 @@ import ReplyForm from "./ReplyForm.jsx";
 import UserOptions from "./UserOptions.jsx";
 import UserTag from "./UserTag.jsx";
 
+import { commentPropTypes } from "../propTypes.js";
+
 export default function Comment(props) {
     const loggedUser = useContext(UserContext);
     const [editForm, setEditForm] = useState(false);
@@ -47,7 +49,7 @@ export default function Comment(props) {
             replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "").trim();
 
             const newReply = {
-                id: generateID(props.replies || props.siblings),
+                id: generateID(props.replies || props.siblings).toString(),
                 content: replyText,
                 score: 0,
                 replyingTo: props.user.username,
@@ -181,37 +183,13 @@ export default function Comment(props) {
     );
 }
 
-const commentPropTypes = PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    createdAt: PropTypes.number.isRequired,
-    score: PropTypes.number.isRequired,
-
-    user: PropTypes.shape({
-        image: PropTypes.shape({
-            png: PropTypes.string,
-            webp: PropTypes.string,
-        }),
-
-        username: PropTypes.string,
-    }).isRequired,
-
-    actions: PropTypes.shape({
-        handleReply: PropTypes.func,
-        editReply: PropTypes.func,
-        deleteReply: PropTypes.func,
-        addReply: PropTypes.func,
-        vote: PropTypes.func,
-    }).isRequired,
-});
-
 const commentWithReplies = {
     replies: PropTypes.arrayOf(commentPropTypes),
 };
 
 const commentAsReply = PropTypes.shape({
-    replyingTo: PropTypes.string, // For Comment as Reply
-    commentID: PropTypes.number, // For Comment as Reply
+    replyingTo: PropTypes.string,
+    commentID: PropTypes.number,
     siblings: PropTypes.arrayOf(commentPropTypes),
 });
 

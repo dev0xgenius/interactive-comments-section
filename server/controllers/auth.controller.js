@@ -5,8 +5,10 @@ const db = require("../db");
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
 
-    const { username, password, confirmedPassword } = req?.body;
+    const { username, password, confirmedPassword, avatar } = req?.body;
     if (!username || !password) return res.status(400).end("Missing fields");
+
+    console.log(avatar);
 
     if (confirmedPassword && confirmedPassword !== password) {
         console.log("Password does not match");
