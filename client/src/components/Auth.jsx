@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
+import { useState } from "react";
 import { z } from "zod";
 import FileInput from "./FileInput";
 
@@ -26,17 +26,22 @@ function AuthForm({ onAuthSuccess }) {
     const [password, setPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
 
+    const clearFormFields = () => {
+        setUsername("");
+        setPassword("");
+        setConfirmedPassword("");
+    };
+
     const {
         data,
         error: authFailed,
-        mutate,
+        mutate: authenticate,
     } = useMutation({
         mutationFn: async (data) => {
             const requestUrl = "/auth";
             const request = new Request(requestUrl, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: data,
             });
 
             const response = await fetch(request);
@@ -49,13 +54,13 @@ function AuthForm({ onAuthSuccess }) {
                     throw new Error("Invalid Credentials...");
                 default:
                     console.log(response.status);
+                    console.log(response.statusText);
             }
 
             if (response.status == 200) {
                 let authenticatedUser = await response.json();
+                clearFormFields();
                 onAuthSuccess(authenticatedUser);
-            } else if (response.status == 204) {
-                console.log("User logged in successfully");
             }
 
             return;
@@ -64,10 +69,11 @@ function AuthForm({ onAuthSuccess }) {
 
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        let formData = new FormData(evt.currentTarget);
-
-        const serializedData = {};
-        for (let [key, value] of formData) serializedData[key] = value;
+        const formData = new FormData(evt.target);
+        const serializedData = {
+            username,
+            password,
+        };
 
         const validateForm = formSchema.safeParse(serializedData);
         if (validateForm.error) {
@@ -75,7 +81,7 @@ function AuthForm({ onAuthSuccess }) {
             return;
         }
 
-        mutate(serializedData);
+        authenticate(formData);
     };
 
     return (
@@ -88,6 +94,7 @@ function AuthForm({ onAuthSuccess }) {
                 )}
 
                 <form
+                    encType="multipart/form-data"
                     className="flex flex-col gap-6 max-w-lg"
                     onSubmit={handleSubmit}
                 >
@@ -108,10 +115,10 @@ function AuthForm({ onAuthSuccess }) {
                                 type="password"
                                 placeholder="Enter Password"
                                 name="password"
+                                value={password}
                                 onChange={(evt) =>
                                     setPassword(evt.currentTarget.value)
                                 }
-                                value={password}
                             />
                         </div>
                         {data?.signUp && (
@@ -120,12 +127,12 @@ function AuthForm({ onAuthSuccess }) {
                                     type="password"
                                     placeholder="Confirm Password"
                                     name="confirmedPassword"
+                                    value={confirmedPassword}
                                     onChange={(evt) =>
                                         setConfirmedPassword(
                                             evt.currentTarget.value,
                                         )
                                     }
-                                    value={confirmedPassword}
                                 />
                                 <FileInput />
                             </div>
@@ -135,7 +142,7 @@ function AuthForm({ onAuthSuccess }) {
                         type="submit"
                         className="bg-blue-700 p-4 rounded-md text-white-100 font-semibold"
                     >
-                        Sign Up/Login
+                        Sign Up/Log In
                     </button>
                 </form>
             </div>

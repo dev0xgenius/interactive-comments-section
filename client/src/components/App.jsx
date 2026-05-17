@@ -54,6 +54,7 @@ export default function App() {
     const [user, setUser] = useState(undefined);
     useEffect(() => {
         if (authenticatedUser) setUser(authenticatedUser);
+        console.log(authenticatedUser);
     }, [authenticatedUser]);
 
     const [modalState, setModalState] = useState({

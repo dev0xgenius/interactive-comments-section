@@ -86,7 +86,7 @@ export default function Comment(props) {
             action: handleEditedReply,
             placeholder: "Edit Your Comment...",
             content: content,
-            user: { ...loggedUser, image: "" },
+            user: { ...loggedUser },
         }));
 
         toggleEditForm();
@@ -162,22 +162,18 @@ export default function Comment(props) {
             {!loggedUser ? (
                 <></>
             ) : (
-                <div
-                    className={
-                        replyFormState.isOpen
-                            ? "reply-form bg-white-100 rounded-2xl p-5 w-full"
-                            : "hidden"
-                    }
-                >
-                    <ReplyForm
-                        keepOpen={replyFormState.isOpen}
-                        action={replyFormState.action}
-                        content={replyFormState.content}
-                        placeholder={replyFormState.placeholder}
-                        actionText={replyFormState.actionText}
-                        user={replyFormState.user}
-                    />
-                </div>
+                replyFormState.isOpen && (
+                    <div className="reply-form bg-white-100 rounded-2xl p-5 w-full">
+                        <ReplyForm
+                            keepOpen={replyFormState.isOpen}
+                            action={replyFormState.action}
+                            content={replyFormState.content}
+                            placeholder={replyFormState.placeholder}
+                            actionText={replyFormState.actionText}
+                            user={replyFormState.user}
+                        />
+                    </div>
+                )
             )}
         </div>
     );

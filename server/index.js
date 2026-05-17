@@ -1,11 +1,14 @@
 const db = require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const { messageReducer, resolveComment } = require("./lib/messageResolver.js");
 const { ChatServer } = require("./lib/ChatServer");
 
 const { authRouter } = require("./routes/auth.js");
+const { existsSync } = require("fs");
+const { refreshWithToken } = require("./middlewares/auth.middleware.js");
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -23,6 +26,21 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 app.use(authRouter);
+
+app.get("/avatars/:avatar", (req, res) => {
+    const filePath = path.join(__dirname, req.url);
+
+    if (existsSync(filePath)) {
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                console.log(`Error: ${err}`);
+                res.status(500).end("Couldn't complete the request");
+            }
+        });
+    } else {
+        res.status(404).end("File not found");
+    }
+});
 
 async function getChatMessages() {
     let comments;

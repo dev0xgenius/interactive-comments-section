@@ -1,3 +1,6 @@
+const fsPromises = require("fs/promises");
+const path = require("path");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
@@ -5,10 +8,8 @@ const db = require("../db");
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
 
-    const { username, password, confirmedPassword, avatar } = req?.body;
+    const { username, password, confirmedPassword } = req?.body;
     if (!username || !password) return res.status(400).end("Missing fields");
-
-    console.log(avatar);
 
     if (confirmedPassword && confirmedPassword !== password) {
         console.log("Password does not match");
@@ -92,10 +93,11 @@ async function signUp(req, res) {
     try {
         newUser = await db.query(
             "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
-            [username, hashedPassword, ""],
+            [username, hashedPassword, req?.file.path],
         );
     } catch (e) {
         console.log(e);
+        req?.file && fsPromises.unlink(path.join(req?.file.path)).catch;
         return res.status(500).end("Server failure");
     }
 

@@ -16,6 +16,7 @@ export default defineConfig({
                 ws: true,
                 rewriteWsOrigin: true,
             },
+            "/avatars": "http://localhost:8080",
         },
         hmr: {
             overlay: false,

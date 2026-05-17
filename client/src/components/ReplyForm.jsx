@@ -21,20 +21,14 @@ export default function ReplyForm(props) {
                 defaultValue={props.content}
             ></textarea>
             <div className="flex justify-between gap-4 items-center">
-                <span className="inline-block w-8">
-                    {props.user.image ? (
-                        <img
-                            src={
-                                // TODO: Make image selection random
-                                props.user.image.png ||
-                                "images/avatars/image-amyrobson.png"
-                            }
-                            width="100%"
-                            height="auto"
-                        />
-                    ) : (
-                        <></>
-                    )}
+                <span className="block size-10 rounded-full border overflow-hidden">
+                    <img
+                        src={props.user.image.png}
+                        width="100%"
+                        height="auto"
+                        className="w-full max-w-full"
+                        alt="Username avatar"
+                    />
                 </span>
                 <button
                     type="submit"
@@ -60,7 +54,7 @@ ReplyForm.propTypes = {
         image: PropTypes.shape({
             png: PropTypes.string.isRequired,
             webp: PropTypes.string,
-        }),
+        }).isRequired,
         username: PropTypes.string.isRequired,
     }),
 };
