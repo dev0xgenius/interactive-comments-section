@@ -8,7 +8,6 @@ const { ChatServer } = require("./lib/ChatServer");
 
 const { authRouter } = require("./routes/auth.js");
 const { existsSync } = require("fs");
-const { refreshWithToken } = require("./middlewares/auth.middleware.js");
 
 const PORT = process.env.PORT || 8080;
 const app = express();
