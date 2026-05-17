@@ -1,3 +1,4 @@
+// TODO: user should be able to reply only to their comment but not their replies
 const db = require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");

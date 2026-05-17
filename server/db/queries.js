@@ -1,3 +1,4 @@
+// TODO: Alter id in replies table to use uuid
 const db = require("./index.js");
 
 async function addComment(comment) {
