@@ -10,7 +10,10 @@ const { refreshWithToken } = require("../middlewares/auth.middleware.js");
 const storage = multer.diskStorage({
     destination: "avatars/",
     filename: (req, file, cb) => {
-        const { username } = req.body;
+        let { username } = req.body;
+        username = username.trim().replace(/\s+/g, "").toLowerCase();
+        console.log("Username: ", username);
+
         const fileExt = path.extname(file.originalname);
         cb(null, username + "-" + file.fieldname + fileExt);
     },

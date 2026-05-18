@@ -33,19 +33,6 @@ export default function UserOptions(props) {
                 </i>
                 <span className="font-semibold text-blue-300">Edit</span>
             </button>
-            <button
-                className="flex items-center gap-2 hover:opacity-80"
-                onClick={props.actions.toggleForm}
-            >
-                <i className="max-w-4 w-full">
-                    <img
-                        src="../../images/icon-reply.svg"
-                        width="100%"
-                        height="auto"
-                    />
-                </i>
-                <span className="font-semibold text-blue-300">Reply</span>
-            </button>
         </div>
     ) : (
         <button

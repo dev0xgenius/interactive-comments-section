@@ -84,7 +84,8 @@ async function signIn(req, res) {
 }
 
 async function signUp(req, res) {
-    const { username, password } = req?.body;
+    let { username, password } = req?.body;
+    username = username.trim().replace(/\s+/g, "").toLowerCase();
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -97,7 +98,7 @@ async function signUp(req, res) {
         );
     } catch (e) {
         console.log(e);
-        req?.file && fsPromises.unlink(path.join(req?.file.path)).catch;
+        req?.file && fsPromises.unlink(path.join(req?.file.path));
         return res.status(500).end("Server failure");
     }
 
