@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { z } from "zod";
 import FileInput from "./FileInput";
+import { useEffect } from "react";
 
 function Input(props) {
     return (
@@ -17,7 +18,7 @@ function Input(props) {
 }
 
 const formSchema = z.object({
-    username: z.string(),
+    username: z.string().regex(/\w+/gi),
     password: z.string(),
 });
 
@@ -33,7 +34,7 @@ function AuthForm({ onAuthSuccess }) {
     };
 
     const {
-        data,
+        data: authData,
         error: authFailed,
         mutate: authenticate,
     } = useMutation({
@@ -59,8 +60,8 @@ function AuthForm({ onAuthSuccess }) {
 
             if (response.status == 200) {
                 let authenticatedUser = await response.json();
-                clearFormFields();
                 onAuthSuccess(authenticatedUser);
+                return {};
             }
 
             return;
@@ -83,6 +84,10 @@ function AuthForm({ onAuthSuccess }) {
 
         authenticate(formData);
     };
+
+    useEffect(() => {
+        if (authData) clearFormFields();
+    }, [authData]);
 
     return (
         <div className="bg-white-100 self-end rounded-2xl p-8 mt-8 w-full md:w-max max-w-full">
@@ -107,9 +112,13 @@ function AuthForm({ onAuthSuccess }) {
                                 placeholder="@johndoe"
                                 name="username"
                                 value={username}
-                                onChange={(evt) =>
-                                    setUsername(evt.currentTarget.value)
-                                }
+                                onChange={(evt) => {
+                                    let updatedUsername = evt.target.value;
+                                    updatedUsername = updatedUsername.trim();
+                                    updatedUsername.replace(/\s/gi, "");
+
+                                    setUsername(updatedUsername);
+                                }}
                             />
                             <Input
                                 type="password"
@@ -121,7 +130,7 @@ function AuthForm({ onAuthSuccess }) {
                                 }
                             />
                         </div>
-                        {data?.signUp && (
+                        {authData?.signUp && (
                             <div className="flex md:flex-nowrap flex-wrap items-center justify-center gap-2">
                                 <Input
                                     type="password"

@@ -91,10 +91,12 @@ async function signUp(req, res) {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     let newUser;
+    const imageUrl = req?.file.path;
+
     try {
         newUser = await db.query(
             "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
-            [username, hashedPassword, req?.file.path],
+            [username, hashedPassword, imageUrl || "avatars/test-avatar.jpg"],
         );
     } catch (e) {
         console.log(e);

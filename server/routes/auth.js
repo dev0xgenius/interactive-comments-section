@@ -12,7 +12,6 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         let { username } = req.body;
         username = username.trim().replace(/\s+/g, "").toLowerCase();
-        console.log("Username: ", username);
 
         const fileExt = path.extname(file.originalname);
         cb(null, username + "-" + file.fieldname + fileExt);

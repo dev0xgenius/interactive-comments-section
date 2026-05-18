@@ -133,14 +133,14 @@ export default function Comment(props) {
                                     user={editFormState.user}
                                 />
                             ) : (
-                                <p className="text-blue-500 overflow-x-auto">
+                                <pre className="text-blue-500 overflow-x-auto font-sans">
                                     {props.replyingTo
                                         ? contentJSX(
                                               props.replyingTo,
                                               props.content,
                                           )
                                         : props.content}
-                                </p>
+                                </pre>
                             )}
                         </main>
                     </div>
