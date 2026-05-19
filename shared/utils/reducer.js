@@ -7,13 +7,18 @@ export default function reducer(state, action) {
 
     switch (type) {
         case "ADD_COMMENT":
-            return state.concat(data);
+            return state.some((comment) => comment?.id == data.id)
+                ? state
+                : state.concat(data);
         case "ADD_REPLY":
             let result = updateComment(state, data.commentID, [
                 "replies",
                 (matchedComment) => {
-                    matchedComment.replies =
-                        matchedComment.replies.concat(data);
+                    matchedComment.replies = matchedComment.replies.some(
+                        (reply) => reply?.id == data.id,
+                    )
+                        ? matchedComment.replies
+                        : matchedComment.replies.concat(data);
 
                     return matchedComment.replies;
                 },
@@ -25,7 +30,7 @@ export default function reducer(state, action) {
                 if (comment.id === data.id) return false;
                 if (comment.replies) {
                     comment.replies = comment.replies.filter(
-                        (reply) => reply.id !== data.id
+                        (reply) => reply.id !== data.id,
                     );
                 }
 

@@ -18,7 +18,7 @@ function Input(props) {
 }
 
 const formSchema = z.object({
-    username: z.string().regex(/\w+/gi),
+    username: z.string(),
     password: z.string(),
 });
 
@@ -61,11 +61,11 @@ function AuthForm({ onAuthSuccess }) {
             if (response.status == 200) {
                 let authenticatedUser = await response.json();
                 onAuthSuccess(authenticatedUser);
-                return {};
             }
 
             return;
         },
+        mutationKey: ["auth"],
     });
 
     const handleSubmit = (evt) => {
@@ -87,6 +87,7 @@ function AuthForm({ onAuthSuccess }) {
 
     useEffect(() => {
         if (authData) clearFormFields();
+        return () => clearFormFields();
     }, [authData]);
 
     return (
@@ -114,7 +115,6 @@ function AuthForm({ onAuthSuccess }) {
                                 value={username}
                                 onChange={(evt) => {
                                     let updatedUsername = evt.target.value;
-                                    updatedUsername = updatedUsername.trim();
                                     updatedUsername.replace(/\s/gi, "");
 
                                     setUsername(updatedUsername);

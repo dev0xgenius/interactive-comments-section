@@ -49,7 +49,7 @@ export default function Comment(props) {
             replyText = replyText.replace(/(^@[0-9a-z]+,?)/, "").trim();
 
             const newReply = {
-                id: generateID(props.replies || props.siblings).toString(),
+                id: generateID(props.replies || props.siblings),
                 content: replyText,
                 score: 0,
                 replyingTo: props.user.username,
@@ -148,8 +148,8 @@ export default function Comment(props) {
                         <div className="comment-actions w-full flex justify-between sm:items-start">
                             <Counter
                                 count={props.score}
-                                onPlusClick={upVote}
-                                onMinusClick={downVote}
+                                onPlusClick={loggedUser ? upVote : () => {}}
+                                onMinusClick={loggedUser ? downVote : () => {}}
                             />
                             <UserOptions
                                 user={props.user}

@@ -4,7 +4,10 @@ const multer = require("multer");
 
 const authRouter = express.Router();
 
-const { handleAuthentication } = require("../controllers/auth.controller.js");
+const {
+    handleAuthentication,
+    handleQuery,
+} = require("../controllers/auth.controller.js");
 const { refreshWithToken } = require("../middlewares/auth.middleware.js");
 
 const storage = multer.diskStorage({
@@ -23,6 +26,7 @@ const upload = multer({ dest: "avatars/", storage });
 
 authRouter.post(
     "/auth",
+    handleQuery,
     refreshWithToken,
     upload.single("avatar"),
     handleAuthentication,

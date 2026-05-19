@@ -26,7 +26,7 @@ export default function ReplyForm(props) {
                         src={props.user.image.png}
                         width="100%"
                         height="auto"
-                        className="w-full max-w-full"
+                        className="w-full max-w-full object-cover"
                         alt="Username avatar"
                     />
                 </span>

@@ -1,9 +1,10 @@
 import { createContext } from "react";
 
 export const UserContext = createContext({
-  image: { 
-      png: "",
-      webp: ""
+    image: {
+        png: "",
+        webp: "",
     },
-    username: "juliusomo"
+    username: "",
 });
+

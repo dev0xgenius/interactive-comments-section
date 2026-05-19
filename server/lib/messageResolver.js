@@ -22,14 +22,14 @@ async function resolveComment(comment) {
 
         if ("replying_to" in comment) {
             resolvedComment.replyingTo = await db.getUsernameFromCommentId(
-                comment.replying_to
+                comment.replying_to,
             );
             resolvedComment.commentID = resolvedComment.replying_to;
         } else {
             let replies = await db.getReplies(comment.id);
 
             resolvedComment.replies = await Promise.all(
-                replies.map((reply) => resolveComment(reply))
+                replies.map((reply) => resolveComment(reply)),
             );
         }
     } catch (e) {
@@ -47,7 +47,7 @@ async function resolveComment(comment) {
 async function handleMessage(
     getMessage,
     decode = (message) => message,
-    errMsg = "An error occured while trying to process the message"
+    errMsg = "An error occured while trying to process the message",
 ) {
     try {
         let message = await Promise.resolve(getMessage());
@@ -73,7 +73,7 @@ class MessageHandler {
             if (message.type === type) {
                 message.data = await this.handler(
                     () => action(message.data),
-                    this.decoder
+                    this.decoder,
                 );
             }
         }
