@@ -115,7 +115,10 @@ function AuthForm({ onAuthSuccess }) {
                                 value={username}
                                 onChange={(evt) => {
                                     let updatedUsername = evt.target.value;
-                                    updatedUsername.replace(/\s/gi, "");
+                                    updatedUsername = updatedUsername.replace(
+                                        /\s/gi,
+                                        "",
+                                    );
 
                                     setUsername(updatedUsername);
                                 }}
