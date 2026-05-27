@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({ dest: "avatars/", storage });
+const upload = multer({ storage, limits: 1024 * 5 });
 
 authRouter.post(
     "/auth",
