@@ -1,5 +1,6 @@
 // TODO: Alter id in replies table to use uuid
 const db = require("./index.js");
+const uuid = require("uuid");
 
 async function addComment(comment) {
     let { userID, content, score } = comment;
@@ -45,7 +46,7 @@ async function addReply(reply) {
 }
 
 function handleDelete({ id }) {
-    return typeof id == "number" ? deleteReply(id) : deleteComment(id);
+    return !uuid.validate(id) ? deleteReply(id) : deleteComment(id);
 }
 
 async function repliesExist(commentID) {
@@ -102,16 +103,15 @@ async function editReply(data) {
     let column_value = data.content ? String(data.content) : Number(data.score);
 
     try {
-        let result =
-            typeof id == "number"
-                ? await db.query(
-                      `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id,replying_to`,
-                      [column_value, id],
-                  )
-                : await db.query(
-                      `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
-                      [column_value, id],
-                  );
+        let result = !uuid.validate(id)
+            ? await db.query(
+                  `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id,replying_to`,
+                  [column_value, id],
+              )
+            : await db.query(
+                  `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
+                  [column_value, id],
+              );
 
         return result.rows[0];
     } catch (e) {

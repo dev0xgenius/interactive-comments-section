@@ -67,6 +67,7 @@ export default function Comment(props) {
     const handleEditedReply = (editedReply) => {
         toggleEditForm();
         editedReply = editedReply.replace(/(^@[0-9a-z]+,?)/, "");
+
         if (editedReply.trim()) props.actions.editReply(editedReply, props.id);
     };
 

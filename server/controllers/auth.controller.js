@@ -107,25 +107,26 @@ async function signUp(req, res) {
     return res.status(204).end("Account created successfully");
 }
 
-async function handleQuery(req, res, next) {
-    const { signout } = req?.query;
-    if (signout == "true") {
-        const { username } = req?.body;
-        try {
-            await db.query("DELETE FROM auth.auth WHERE username=$1", [
-                username,
-            ]);
-        } catch (e) {
-            console.log("Error: ", err);
-            return res.status(500).end("Internal Server Error");
-        }
-    }
+async function handleSignout(req, res, next) {
+    const { username } = req?.body;
+    try {
+        await db.query("DELETE FROM auth.auth WHERE username=$1", [username]);
 
-    next();
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: true,
+        });
+
+        return res.status(204).end();
+    } catch (err) {
+        console.log("Error: ", err);
+        return res.status(500).end("Internal Server Error");
+    }
 }
 
 module.exports = {
-    handleQuery,
+    handleSignout,
     handleAuthentication,
     signIn,
     signUp,

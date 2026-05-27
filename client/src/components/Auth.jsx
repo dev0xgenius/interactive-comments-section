@@ -28,7 +28,6 @@ function AuthForm({ onAuthSuccess }) {
     const [confirmedPassword, setConfirmedPassword] = useState("");
 
     const clearFormFields = () => {
-        setUsername("");
         setPassword("");
         setConfirmedPassword("");
     };
@@ -86,7 +85,10 @@ function AuthForm({ onAuthSuccess }) {
     };
 
     useEffect(() => {
-        if (authData) clearFormFields();
+        if (authData) {
+            clearFormFields();
+        }
+
         return () => clearFormFields();
     }, [authData]);
 

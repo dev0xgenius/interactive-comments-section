@@ -1,4 +1,3 @@
-// TODO: user should be able to reply only to their comment but not their replies
 const db = require("./db");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -8,7 +7,6 @@ const { messageReducer, resolveComment } = require("./lib/messageResolver.js");
 const { ChatServer } = require("./lib/ChatServer");
 
 const { authRouter } = require("./routes/auth.js");
-const { existsSync } = require("fs");
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -28,18 +26,16 @@ app.use(cookieParser());
 app.use(authRouter);
 
 app.get("/avatars/:avatar", (req, res) => {
-    const filePath = path.join(__dirname, req.url);
+    const { avatar } = req.params;
+    const name = path.basename(avatar);
+    const avatarsDir = path.join(__dirname, "avatars");
 
-    if (existsSync(filePath)) {
-        res.sendFile(filePath, (err) => {
-            if (err) {
-                console.log(`Error: ${err}`);
-                res.status(500).end("Couldn't complete the request");
-            }
-        });
-    } else {
-        res.status(404).end("File not found");
-    }
+    res.sendFile(name, { root: avatarsDir }, (err) => {
+        if (err) {
+            console.log(`Error: ${err}`);
+            res.status(500).end("Couldn't complete the request");
+        }
+    });
 });
 
 async function getChatMessages() {

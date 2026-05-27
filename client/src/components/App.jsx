@@ -60,7 +60,7 @@ export default function App() {
 
     const { error: signOutError, mutate: signOut } = useMutation({
         mutationFn: async (authenticatedUser) => {
-            await fetch("/auth?signout=true", {
+            await fetch("/auth/signout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

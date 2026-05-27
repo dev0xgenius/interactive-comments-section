@@ -63,7 +63,7 @@ const getReplies = (commentId) => {
             .then((data) => {
                 data.rows = data.rows.map((row) => ({
                     ...row,
-                    id: row.id.toString(),
+                    id: row.id,
                 }));
                 resolve(data.rows);
             })

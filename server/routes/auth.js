@@ -6,7 +6,7 @@ const authRouter = express.Router();
 
 const {
     handleAuthentication,
-    handleQuery,
+    handleSignout,
 } = require("../controllers/auth.controller.js");
 const { refreshWithToken } = require("../middlewares/auth.middleware.js");
 
@@ -19,18 +19,18 @@ const storage = multer.diskStorage({
         const fileExt = path.extname(file.originalname);
         cb(null, username + "-" + file.fieldname + fileExt);
     },
-    limits: 1024,
 });
 
 const upload = multer({ dest: "avatars/", storage });
 
 authRouter.post(
     "/auth",
-    handleQuery,
     refreshWithToken,
     upload.single("avatar"),
     handleAuthentication,
 );
+
+authRouter.post("/auth/signout", handleSignout);
 
 module.exports = {
     authRouter,
