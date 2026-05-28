@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useReducer, useState } from "react";
 import useWebSocket from "../hooks/useWebSocket.js";
 import { UserContext } from "../utils/contexts/UserContext.js";
@@ -12,38 +12,43 @@ import Auth from "./Auth.jsx";
 import LoadingSkeleton from "./LoadingSkeleton.jsx";
 
 export default function App() {
+    const [user, setUser] = useState(undefined);
     const [comments, dispatch] = useReducer(reducer, []);
+    const [signOutErrorMsg, setSignOutErrorMsg] = useState(null);
+    const [modalState, setModalState] = useState({
+        msg: "",
+        headerMsg: "",
+        isOpen: false,
+        handleResponse: null,
+    });
 
     let protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const [loadMessages, sendMessage] = useWebSocket(
         `${protocol}://${window.location.host}/comments`,
-        dispatch
+        dispatch,
     );
 
     const {
-        isLoading,
+        isLoading: messagesLoading,
         data: messages,
         error,
     } = useQuery({
         queryKey: ["comments"],
         queryFn: async () => {
-            // TODO: Remove pause
-            await new Promise((resolve) => setTimeout(resolve, 3000));
             return loadMessages();
         },
     });
 
     useEffect(() => {
-        if (!isLoading && !error) {
+        if (!messagesLoading && !error) {
             messages.forEach((message) => dispatch(message));
         }
-    }, [messages, isLoading, error]);
+    }, [messages, messagesLoading, error]);
 
-    let { data: loggedUser } = useQuery({
+    const { data: authenticatedUser } = useQuery({
         queryKey: ["user"],
         queryFn: async () => {
             const response = await fetch("/auth", { method: "POST" });
-
             if (response.status != 200) {
                 console.log("Couldn't authenticate user");
                 throw "Couldn't authenticate user";
@@ -51,22 +56,53 @@ export default function App() {
 
             return await response.json();
         },
+        retry: 2,
     });
 
-    const [modalState, setModalState] = useState({
-        isOpen: false,
-        handleResponse: null,
+    const { error: signOutError, mutate: signOut } = useMutation({
+        mutationFn: async (authenticatedUser) => {
+            await fetch("/auth/signout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(authenticatedUser),
+            });
+        },
+
+        mutationKey: ["logout"],
     });
 
-    if (isLoading) {
+    useEffect(() => {
+        if (authenticatedUser) setUser(authenticatedUser);
+    }, [authenticatedUser]);
+
+    useEffect(() => {
+        if (signOutError) {
+            setSignOutErrorMsg("Couldn't sign you out right now");
+        }
+    }, [signOutError]);
+
+    useEffect(() => {
+        if (signOutErrorMsg) {
+            showModal(signOutErrorMsg, "Error").then(() => {
+                setSignOutErrorMsg(null);
+                closeModal();
+            });
+        }
+    }, [signOutErrorMsg]);
+
+    if (messagesLoading) {
         return <LoadingSkeleton />;
     } else if (error) {
-        <div>Sorry an unexpected server error occured!!!</div>;
+        return <div>Sorry an unexpected server error occured!!!</div>;
     }
 
-    const showModal = () => {
+    const showModal = (msg, headerMsg) => {
         return new Promise((resolve) => {
             setModalState(() => ({
+                msg,
+                headerMsg,
                 isOpen: true,
                 handleResponse: resolve,
             }));
@@ -76,13 +112,14 @@ export default function App() {
     const closeModal = () => {
         setModalState(() => ({
             isOpen: false,
+            msg: "",
             handleResponse: null,
         }));
     };
 
     const addComment = (comment) => {
         const data = {
-            userID: loggedUser.id,
+            userID: user.id,
             content: comment,
             score: 0,
         };
@@ -91,7 +128,7 @@ export default function App() {
     };
 
     const addReply = (reply, commentID) => {
-        reply.userID = loggedUser.id;
+        reply.userID = user.id;
         reply.commentID = commentID;
 
         sendMessage({
@@ -101,7 +138,11 @@ export default function App() {
     };
 
     const deleteReply = async (replyID) => {
-        let userSelection = await showModal();
+        let userSelection = await showModal(
+            `Are you sure you want to remove this comment?
+                This will remove the comment and can't be undone`,
+            "Delete Comment",
+        );
 
         if (userSelection) {
             closeModal();
@@ -131,42 +172,67 @@ export default function App() {
         });
     };
 
+    const handleSignOut = async () => {
+        const userSelection = await showModal(
+            "Are you sure you want to sign out?",
+            "Sign Out",
+        );
+
+        if (userSelection) {
+            closeModal();
+            signOut(authenticatedUser);
+            setUser(null);
+        } else closeModal();
+    };
+
     return (
-        <UserContext.Provider value={loggedUser}>
+        <UserContext.Provider value={user}>
             <Modal
-                mainMsg="Are you sure you want to remove this comment?
-                This will remove the comment and can't be undone"
-                headerMsg="Delete Comment"
+                mainMsg={modalState.msg}
+                headerMsg={modalState.headerMsg}
                 isOpen={modalState.isOpen}
                 handleResponse={modalState.handleResponse}
             />
-            <div className="wrapper m-auto w-full max-w-3xl flex flex-col gap-0 px-5 py-2.5 items-center">
-                {comments?.length == 0 ? (
-                    <span className="bg-white-100 px-8 py-4 my-6 rounded-md text-gray-400">
-                        {"Be the first to say something"}
-                    </span>
-                ) : (
-                    <Comments
-                        data={comments}
-                        actions={{ addReply, deleteReply, editReply, vote }}
-                    />
-                )}
-                {loggedUser ? (
-                    <div className="reply-form w-full bg-white-100 rounded-2xl p-5">
-                        <ReplyForm
-                            keepOpen={true}
-                            placeholder="Add a comment..."
-                            user={loggedUser}
-                            action={addComment}
+            <div className="min-h-screen w-full m-auto flex items-center justify-center max-w-screen-md px-5 py-2.5">
+                <div className="w-full flex flex-col gap-4 items-center justify-center">
+                    {comments?.length == 0 ? (
+                        <span className="font-extrabold tracking-tighter md:text-7xl text-4xl px-8 py-4 my-6 rounded-md text-gray-400">
+                            {"Be the first to say something"}
+                        </span>
+                    ) : (
+                        <Comments
+                            data={comments}
+                            actions={{
+                                addReply,
+                                deleteReply,
+                                editReply,
+                                vote,
+                            }}
                         />
-                    </div>
-                ) : (
-                    <Auth
-                        onAuthSuccess={(authenticatedUser) =>
-                            (loggedUser = authenticatedUser)
-                        }
-                    />
-                )}
+                    )}
+                    {user ? (
+                        <div className="reply-form w-full bg-white-100 rounded-2xl p-5 relative">
+                            <ReplyForm
+                                keepOpen={true}
+                                placeholder="Add a comment..."
+                                user={user}
+                                action={addComment}
+                            />
+                            <button
+                                className="rounded-md text-xs bg-red-500 px-4 py-2 text-white-50 absolute right-0 -bottom-12 font-bold"
+                                onClick={handleSignOut}
+                            >
+                                Sign Out
+                            </button>
+                        </div>
+                    ) : (
+                        <Auth
+                            onAuthSuccess={(authenticatedUser) =>
+                                setUser(authenticatedUser)
+                            }
+                        />
+                    )}
+                </div>
             </div>
         </UserContext.Provider>
     );

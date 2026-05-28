@@ -8,12 +8,21 @@ import ReplyForm from "./ReplyForm.jsx";
 import UserOptions from "./UserOptions.jsx";
 import UserTag from "./UserTag.jsx";
 
-// import { motion } from "motion/react";
+import { commentPropTypes } from "../propTypes.js";
 
 export default function Comment(props) {
     const loggedUser = useContext(UserContext);
     const [editForm, setEditForm] = useState(false);
-    const [formState, setFormState] = useState({
+    const [editFormState, setEditFormState] = useState({
+        isOpen: false,
+        action: () => {},
+        actionText: "",
+        placeholder: "",
+        content: "",
+        user: { username: "" },
+    });
+
+    const [replyFormState, setReplyFormSTate] = useState({
         isOpen: false,
         action: () => {},
         actionText: "",
@@ -24,11 +33,12 @@ export default function Comment(props) {
 
     const upVote = () => props.actions.vote(1, props.id);
     const downVote = () => props.actions.vote(-1, props.id);
-    const openForm = () => setFormState((fs) => ({ ...fs, isOpen: true }));
-    const closeForm = () => setFormState((fs) => ({ ...fs, isOpen: false }));
+    const openForm = () => setReplyFormSTate((fs) => ({ ...fs, isOpen: true }));
+    const closeForm = () =>
+        setReplyFormSTate((fs) => ({ ...fs, isOpen: false }));
 
     const toggleForm = () => {
-        let formOpen = formState.isOpen;
+        let formOpen = replyFormState.isOpen;
         formOpen ? closeForm() : openForm();
     };
 
@@ -49,7 +59,7 @@ export default function Comment(props) {
             if (replyText)
                 props.actions.addReply(newReply, props.commentID || props.id);
         },
-        [props]
+        [props],
     );
 
     const deleteReply = () => props.actions.deleteReply(props.id);
@@ -57,6 +67,7 @@ export default function Comment(props) {
     const handleEditedReply = (editedReply) => {
         toggleEditForm();
         editedReply = editedReply.replace(/(^@[0-9a-z]+,?)/, "");
+
         if (editedReply.trim()) props.actions.editReply(editedReply, props.id);
     };
 
@@ -69,14 +80,14 @@ export default function Comment(props) {
         if (props.replyingTo)
             content = `@${props.replyingTo}, ${content.trim()}`;
 
-        setFormState((fs) => ({
+        setEditFormState((fs) => ({
             ...fs,
             isOpen: !editForm,
             actionText: "UPDATE",
             action: handleEditedReply,
             placeholder: "Edit Your Comment...",
             content: content,
-            user: { ...loggedUser, image: "" },
+            user: { ...loggedUser },
         }));
 
         toggleEditForm();
@@ -90,7 +101,7 @@ export default function Comment(props) {
     );
 
     useEffect(() => {
-        setFormState((fs) => ({
+        setReplyFormSTate((fs) => ({
             ...fs,
             user: loggedUser,
             content: `@${props.user.username}, `,
@@ -115,22 +126,22 @@ export default function Comment(props) {
                         <main className="w-full">
                             {editForm ? (
                                 <ReplyForm
-                                    keepOpen={formState.isOpen}
-                                    action={formState.action}
-                                    content={formState.content}
-                                    placeholder={formState.placeholder}
-                                    actionText={formState.actionText}
-                                    user={formState.user}
+                                    keepOpen={editFormState.isOpen}
+                                    action={editFormState.action}
+                                    content={editFormState.content}
+                                    placeholder={editFormState.placeholder}
+                                    actionText={editFormState.actionText}
+                                    user={editFormState.user}
                                 />
                             ) : (
-                                <p className="text-blue-500 overflow-x-auto">
+                                <pre className="text-blue-500 overflow-x-auto font-sans">
                                     {props.replyingTo
                                         ? contentJSX(
                                               props.replyingTo,
-                                              props.content
+                                              props.content,
                                           )
                                         : props.content}
-                                </p>
+                                </pre>
                             )}
                         </main>
                     </div>
@@ -138,73 +149,44 @@ export default function Comment(props) {
                         <div className="comment-actions w-full flex justify-between sm:items-start">
                             <Counter
                                 count={props.score}
-                                onPlusClick={upVote}
-                                onMinusClick={downVote}
+                                onPlusClick={loggedUser ? upVote : () => {}}
+                                onMinusClick={loggedUser ? downVote : () => {}}
                             />
                             <UserOptions
                                 user={props.user}
-                                toggleForm={toggleForm}
-                                actions={{ deleteReply, editReply }}
+                                actions={{ deleteReply, editReply, toggleForm }}
                             />
                         </div>
                     </footer>
                 </div>
             </div>
-            {!loggedUser || loggedUser?.username === props.user.username ? (
+            {!loggedUser ? (
                 <></>
             ) : (
-                <div
-                    className={
-                        formState.isOpen
-                            ? "reply-form bg-white-100 rounded-2xl p-5 w-full"
-                            : "hidden"
-                    }
-                >
-                    <ReplyForm
-                        keepOpen={formState.isOpen}
-                        action={formState.action}
-                        content={formState.content}
-                        placeholder={formState.placeholder}
-                        actionText={formState.actionText}
-                        user={formState.user}
-                    />
-                </div>
+                replyFormState.isOpen && (
+                    <div className="reply-form bg-white-100 rounded-2xl p-5 w-full">
+                        <ReplyForm
+                            keepOpen={replyFormState.isOpen}
+                            action={replyFormState.action}
+                            content={replyFormState.content}
+                            placeholder={replyFormState.placeholder}
+                            actionText={replyFormState.actionText}
+                            user={replyFormState.user}
+                        />
+                    </div>
+                )
             )}
         </div>
     );
 }
-
-const commentPropTypes = PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    createdAt: PropTypes.number.isRequired,
-    score: PropTypes.number.isRequired,
-
-    user: PropTypes.shape({
-        image: PropTypes.shape({
-            png: PropTypes.string,
-            webp: PropTypes.string,
-        }),
-
-        username: PropTypes.string,
-    }).isRequired,
-
-    actions: PropTypes.shape({
-        handleReply: PropTypes.func,
-        editReply: PropTypes.func,
-        deleteReply: PropTypes.func,
-        addReply: PropTypes.func,
-        vote: PropTypes.func,
-    }).isRequired,
-});
 
 const commentWithReplies = {
     replies: PropTypes.arrayOf(commentPropTypes),
 };
 
 const commentAsReply = PropTypes.shape({
-    replyingTo: PropTypes.string, // For Comment as Reply
-    commentID: PropTypes.number, // For Comment as Reply
+    replyingTo: PropTypes.string,
+    commentID: PropTypes.number,
     siblings: PropTypes.arrayOf(commentPropTypes),
 });
 

@@ -34,7 +34,7 @@ export default function Replies({ replies, actions }) {
 
 const dataShape = PropTypes.arrayOf(
     PropTypes.shape({
-        id: PropTypes.number.isRequired,
+        id: PropTypes.string.isRequired,
         content: PropTypes.string.isRequired || PropTypes.shape({}),
         createdAt: PropTypes.number.isRequired,
         score: PropTypes.number.isRequired,
@@ -47,7 +47,7 @@ const dataShape = PropTypes.arrayOf(
             }),
             username: PropTypes.string,
         }).isRequired,
-    })
+    }),
 );
 
 Replies.propTypes = {
@@ -55,9 +55,9 @@ Replies.propTypes = {
         addReply: PropTypes.func,
         deleteReply: PropTypes.func,
         editReply: PropTypes.func,
-    }),
+    }).isRequired,
 
-    commentID: PropTypes.number.isRequired,
+    commentID: PropTypes.number,
     replies: dataShape,
     data: dataShape,
 };

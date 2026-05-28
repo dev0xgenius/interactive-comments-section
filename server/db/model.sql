@@ -1,7 +1,14 @@
+CREATE SCHEMA IF NOT EXISTS auth;
+
+CREATE TABLE IF NOT EXISTS auth.auth (
+    username VARCHAR(32),
+    token TEXT
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(32),
-    password_hash VARCHAR(36),
+    password_hash VARCHAR,
     image_url TEXT
 );
 

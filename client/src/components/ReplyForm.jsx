@@ -11,7 +11,7 @@ export default function ReplyForm(props) {
     };
 
     return props.keepOpen ? (
-        <form className="grid gap-4" onSubmit={submitReply}>
+        <form className="grid gap-4 sticky bottom-0" onSubmit={submitReply}>
             <textarea
                 name="content"
                 className="rounded-xl w-full border px-5 py-2.5 
@@ -20,21 +20,15 @@ export default function ReplyForm(props) {
                 placeholder={props.placeholder || "Reply..."}
                 defaultValue={props.content}
             ></textarea>
-            <div className="flex justify-between items-center">
-                <span className="inline-block w-8">
-                    {props.user.image ? (
-                        <img
-                            src={
-                                // TODO: Make image selection random
-                                props.user.image.png ||
-                                "images/avatars/image-amyrobson.png"
-                            }
-                            width="100%"
-                            height="auto"
-                        />
-                    ) : (
-                        <></>
-                    )}
+            <div className="flex justify-between gap-4 items-center">
+                <span className="block size-10 rounded-full border overflow-hidden">
+                    <img
+                        src={props.user.image.png}
+                        width="100%"
+                        height="auto"
+                        className="w-full max-w-full object-cover"
+                        alt="Username avatar"
+                    />
                 </span>
                 <button
                     type="submit"
@@ -59,8 +53,8 @@ ReplyForm.propTypes = {
     user: PropTypes.shape({
         image: PropTypes.shape({
             png: PropTypes.string.isRequired,
-            webp: PropTypes.string.isRequired,
-        }),
+            webp: PropTypes.string,
+        }).isRequired,
         username: PropTypes.string.isRequired,
     }),
 };

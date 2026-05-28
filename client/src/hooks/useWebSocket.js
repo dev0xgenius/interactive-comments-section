@@ -6,8 +6,8 @@ export default function useWebSocket(url, handleMessage) {
         console.log(
             "Nothing to do with ",
             JSON.stringify(data),
-            " at this moment..."
-        )
+            " at this moment...",
+        ),
     );
 
     const loadMessages = () => {
@@ -27,13 +27,12 @@ export default function useWebSocket(url, handleMessage) {
 
                 clearInterval(t);
                 reject("Timeout: Couldn't fetch data within 5 seconds");
-            }, 3000);
+            }, 5000);
         });
     };
 
     useEffect(() => {
         const websocket = new WebSocket(url);
-
         websocket.onopen = () => {
             messageHandler.current = (data) => {
                 data = {
@@ -58,7 +57,7 @@ export default function useWebSocket(url, handleMessage) {
                     if (data) handleMessage(JSON.parse(data));
                 });
             },
-            { once: true }
+            { once: true },
         );
 
         websocket.onerror = () => {
