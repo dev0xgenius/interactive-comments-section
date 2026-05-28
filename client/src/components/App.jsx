@@ -14,6 +14,7 @@ import LoadingSkeleton from "./LoadingSkeleton.jsx";
 export default function App() {
     const [user, setUser] = useState(undefined);
     const [comments, dispatch] = useReducer(reducer, []);
+    const [signOutErrorMsg, setSignOutErrorMsg] = useState(null);
     const [modalState, setModalState] = useState({
         msg: "",
         headerMsg: "",
@@ -74,13 +75,27 @@ export default function App() {
 
     useEffect(() => {
         if (authenticatedUser) setUser(authenticatedUser);
-        if (signOutError) throw "Couldn't sign you out right now";
-    }, [authenticatedUser, signOutError]);
+    }, [authenticatedUser]);
+
+    useEffect(() => {
+        if (signOutError) {
+            setSignOutErrorMsg("Couldn't sign you out right now");
+        }
+    }, [signOutError]);
+
+    useEffect(() => {
+        if (signOutErrorMsg) {
+            showModal(signOutErrorMsg, "Error").then(() => {
+                setSignOutErrorMsg(null);
+                closeModal();
+            });
+        }
+    }, [signOutErrorMsg]);
 
     if (messagesLoading) {
         return <LoadingSkeleton />;
     } else if (error) {
-        <div>Sorry an unexpected server error occured!!!</div>;
+        return <div>Sorry an unexpected server error occured!!!</div>;
     }
 
     const showModal = (msg, headerMsg) => {

@@ -14,14 +14,26 @@ const storage = multer.diskStorage({
     destination: "avatars/",
     filename: (req, file, cb) => {
         let { username } = req.body;
-        username = username.trim().replace(/\s+/g, "").toLowerCase();
+        username = username.trim().replace(/\s+/g, "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
 
         const fileExt = path.extname(file.originalname);
-        cb(null, username + "-" + file.fieldname + fileExt);
+        const sanitized = path.basename(username + "-" + file.fieldname + fileExt);
+        cb(null, sanitized);
     },
 });
 
-const upload = multer({ storage, limits: 1024 * 5 });
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+        if (allowed.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only image files (JPEG, PNG, GIF, WebP) are allowed"));
+        }
+    },
+});
 
 authRouter.post(
     "/auth",
