@@ -10,6 +10,7 @@ const LoadingSkeleton = () => {
                 <div className="pl-12 border-l-2 w-full max-w-3xl m-auto">
                     <div className="animate-pulse w-full max-w-3xl min-h-40 bg-white-100 rounded-2xl m-auto" />
                 </div>
+                <div className="animate-pulse w-full px-5 py-6 max-w-3xl min-h-40 bg-white-100 rounded-2xl m-auto" />
             </div>
         </div>
     );
