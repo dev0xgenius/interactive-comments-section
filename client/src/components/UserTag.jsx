@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { UserContext } from "../utils/contexts/UserContext";
 import { useContext } from "react";
 import PropTypes from "prop-types";
@@ -7,18 +8,21 @@ export default function UserTag({ user }) {
 
     return (
         <span className="user flex gap-4 items-center">
-            <span className="block size-10 rounded-full border overflow-hidden">
-                <img src={user.image.png} width="100%" height="auto" />
+            <span className="block size-10 rounded-full border overflow-hidden shadow-sm">
+                <img src={user.image.png} width="100%" height="auto" alt={user.username} />
             </span>
             <span className="flex gap-2 justify-center items-center">
                 <span className="author">{user.username}</span>
                 {user.username === loggedUser?.username ? (
-                    <span
+                    <motion.span
                         className="bg-blue-300 text-white-100 text-sm
               rounded-sm px-2 py-0.25 pb-0.5 font-bold tracking-wider"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.15 }}
                     >
                         you
-                    </span>
+                    </motion.span>
                 ) : (
                     <></>
                 )}

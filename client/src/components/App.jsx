@@ -1,5 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useReducer, useState } from "react";
+import { motion } from "motion/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import useWebSocket from "../hooks/useWebSocket.js";
 import { UserContext } from "../utils/contexts/UserContext.js";
 import Comments from "./Comments";
@@ -12,9 +13,11 @@ import Auth from "./Auth.jsx";
 import LoadingSkeleton from "./LoadingSkeleton.jsx";
 
 export default function App() {
+    const queryClient = useQueryClient();
     const [user, setUser] = useState(undefined);
     const [comments, dispatch] = useReducer(reducer, []);
     const [signOutErrorMsg, setSignOutErrorMsg] = useState(null);
+    const [isSending, setIsSending] = useState(false);
     const [modalState, setModalState] = useState({
         msg: "",
         headerMsg: "",
@@ -45,7 +48,7 @@ export default function App() {
         }
     }, [messages, messagesLoading, error]);
 
-    const { data: authenticatedUser } = useQuery({
+    const { data: authenticatedUser, isLoading: authLoading } = useQuery({
         queryKey: ["user"],
         queryFn: async () => {
             const response = await fetch("/auth", { method: "POST" });
@@ -92,12 +95,6 @@ export default function App() {
         }
     }, [signOutErrorMsg]);
 
-    if (messagesLoading) {
-        return <LoadingSkeleton />;
-    } else if (error) {
-        return <div>Sorry an unexpected server error occured!!!</div>;
-    }
-
     const showModal = (msg, headerMsg) => {
         return new Promise((resolve) => {
             setModalState(() => ({
@@ -117,25 +114,35 @@ export default function App() {
         }));
     };
 
-    const addComment = (comment) => {
-        const data = {
-            userID: user.id,
-            content: comment,
-            score: 0,
-        };
+    const addComment = useCallback(
+        (comment) => {
+            const data = {
+                userID: user.id,
+                content: comment,
+                score: 0,
+            };
 
-        sendMessage({ type: "ADD_COMMENT", data });
-    };
+            setIsSending(true);
+            sendMessage({ type: "ADD_COMMENT", data });
+            setTimeout(() => setIsSending(false), 600);
+        },
+        [user, sendMessage],
+    );
 
-    const addReply = (reply, commentID) => {
-        reply.userID = user.id;
-        reply.commentID = commentID;
+    const addReply = useCallback(
+        (reply, commentID) => {
+            reply.userID = user.id;
+            reply.commentID = commentID;
 
-        sendMessage({
-            type: "ADD_REPLY",
-            data: reply,
-        });
-    };
+            setIsSending(true);
+            sendMessage({
+                type: "ADD_REPLY",
+                data: reply,
+            });
+            setTimeout(() => setIsSending(false), 600);
+        },
+        [user, sendMessage],
+    );
 
     const deleteReply = async (replyID) => {
         let userSelection = await showModal(
@@ -185,6 +192,57 @@ export default function App() {
         } else closeModal();
     };
 
+    if (messagesLoading) {
+        return <LoadingSkeleton />;
+    } else if (error) {
+        return (
+            <div className="min-h-screen w-full flex items-center justify-center px-5">
+                <motion.div
+                    className="bg-white-100 rounded-2xl p-8 shadow-modal max-w-md w-full text-center flex flex-col items-center gap-4"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.12, ease: "easeOut" }}
+                >
+                    <div className="size-14 rounded-full bg-red-100/10 flex items-center justify-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#ed6468"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-blue-600">
+                        Something went wrong
+                    </h2>
+                    <p className="text-blue-500 text-sm leading-relaxed">
+                        We couldn&apos;t load the comments. This might be a
+                        network issue or the server is temporarily unavailable.
+                    </p>
+                    <motion.button
+                        onClick={() =>
+                            queryClient.refetchQueries({
+                                queryKey: ["comments"],
+                            })
+                        }
+                        className="mt-2 bg-blue-300 text-white-100 font-bold px-6 py-3 rounded-xl cursor-pointer transition-all duration-150 hover:shadow-md hover:brightness-110"
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        Try Again
+                    </motion.button>
+                </motion.div>
+            </div>
+        );
+    }
+
     return (
         <UserContext.Provider value={user}>
             <Modal
@@ -196,9 +254,14 @@ export default function App() {
             <div className="min-h-screen w-full m-auto flex items-center justify-center max-w-screen-md px-5 py-2.5">
                 <div className="w-full flex flex-col gap-4 items-center justify-center">
                     {comments?.length == 0 ? (
-                        <span className="font-extrabold tracking-tighter md:text-7xl text-4xl px-8 py-4 my-6 rounded-md text-gray-400">
+                        <motion.span
+                            className="font-extrabold tracking-tight md:text-5xl text-3xl px-8 py-6 my-8 rounded-2xl text-blue-500/40 select-none"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
                             {"Be the first to say something"}
-                        </span>
+                        </motion.span>
                     ) : (
                         <Comments
                             data={comments}
@@ -211,20 +274,38 @@ export default function App() {
                         />
                     )}
                     {user ? (
-                        <div className="reply-form w-full bg-white-100 rounded-2xl p-5 relative">
+                        <div className="reply-form w-full bg-white-100 rounded-2xl p-5 relative shadow-card">
                             <ReplyForm
                                 keepOpen={true}
                                 placeholder="Add a comment..."
                                 user={user}
                                 action={addComment}
+                                isSending={isSending}
                             />
-                            <button
-                                className="rounded-md text-xs bg-red-500 px-4 py-2 text-white-50 absolute right-0 -bottom-12 font-bold"
+                            <motion.button
+                                className="rounded-lg text-xs bg-red-100 px-4 py-2 text-white-100 absolute right-0 -bottom-12 font-bold cursor-pointer transition-all duration-150 hover:shadow-md hover:brightness-110"
                                 onClick={handleSignOut}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 Sign Out
-                            </button>
+                            </motion.button>
                         </div>
+                    ) : authLoading ? (
+                        <motion.div
+                            className="bg-white-100 rounded-2xl p-8 mt-8 w-full self-end md:w-10/12 max-w-full shadow-card"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                        >
+                            <div className="flex flex-col gap-6 max-w-lg mx-auto">
+                                <div className="h-5 w-40 rounded bg-gradient-to-r from-blue-200/10 via-white-50/50 to-blue-200/10 bg-[length:200%_100%] animate-shimmer" />
+                                <div className="flex flex-col gap-3">
+                                    <div className="h-10 w-full rounded-lg bg-gradient-to-r from-blue-200/10 via-white-50/50 to-blue-200/10 bg-[length:200%_100%] animate-shimmer" />
+                                    <div className="h-10 w-full rounded-lg bg-gradient-to-r from-blue-200/10 via-white-50/50 to-blue-200/10 bg-[length:200%_100%] animate-shimmer" />
+                                </div>
+                                <div className="h-12 w-full rounded-xl bg-gradient-to-r from-blue-200/10 via-white-50/50 to-blue-200/10 bg-[length:200%_100%] animate-shimmer" />
+                            </div>
+                        </motion.div>
                     ) : (
                         <Auth
                             onAuthSuccess={(authenticatedUser) =>

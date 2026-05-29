@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import PropTypes from "prop-types";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { UserContext } from "../utils/contexts/UserContext.js";
@@ -111,14 +112,23 @@ export default function Comment(props) {
     }, [loggedUser, addReply, props.user.username]);
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="comment rounded-2xl p-5 bg-white-100 h-max">
+        <motion.div
+            className="flex flex-col gap-4"
+            layout
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+        >
+            <motion.div
+                className="comment rounded-2xl p-5 bg-white-100 h-max shadow-card"
+                layout
+            >
                 <div className="flex flex-col sm:grid gap-4 h-max sm:grid-cols-12 sm:grid-rows-1">
                     <div className="content sm:col-start-2 sm:col-span-full flex flex-col gap-4 sm:row-start-1 sm:pl-5">
                         <header>
                             <div className="comment-info flex gap-4 items-center">
                                 <UserTag user={props.user} />
-                                <span className="text-blue-500">
+                                <span className="text-blue-500 text-sm">
                                     {elapsedString(new Date(props.createdAt))}
                                 </span>
                             </div>
@@ -134,7 +144,7 @@ export default function Comment(props) {
                                     user={editFormState.user}
                                 />
                             ) : (
-                                <pre className="text-blue-500 overflow-x-auto font-sans">
+                                <pre className="text-blue-500 overflow-x-auto font-sans leading-relaxed">
                                     {props.replyingTo
                                         ? contentJSX(
                                               props.replyingTo,
@@ -149,8 +159,9 @@ export default function Comment(props) {
                         <div className="comment-actions w-full flex justify-between sm:items-start">
                             <Counter
                                 count={props.score}
-                                onPlusClick={loggedUser ? upVote : () => {}}
-                                onMinusClick={loggedUser ? downVote : () => {}}
+                                disabled={!loggedUser}
+                                onPlusClick={upVote}
+                                onMinusClick={downVote}
                             />
                             <UserOptions
                                 user={props.user}
@@ -159,24 +170,30 @@ export default function Comment(props) {
                         </div>
                     </footer>
                 </div>
-            </div>
-            {!loggedUser ? (
-                <></>
-            ) : (
-                replyFormState.isOpen && (
-                    <div className="reply-form bg-white-100 rounded-2xl p-5 w-full">
-                        <ReplyForm
-                            keepOpen={replyFormState.isOpen}
-                            action={replyFormState.action}
-                            content={replyFormState.content}
-                            placeholder={replyFormState.placeholder}
-                            actionText={replyFormState.actionText}
-                            user={replyFormState.user}
-                        />
-                    </div>
-                )
+            </motion.div>
+            {loggedUser && (
+                <AnimatePresence>
+                    {replyFormState.isOpen && (
+                        <motion.div
+                            className="reply-form bg-white-100 rounded-2xl p-5 w-full shadow-card border border-blue-200/20"
+                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                            animate={{ opacity: 1, height: "auto", marginTop: 0 }}
+                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                            transition={{ duration: 0.12, ease: "easeInOut" }}
+                        >
+                            <ReplyForm
+                                keepOpen={replyFormState.isOpen}
+                                action={replyFormState.action}
+                                content={replyFormState.content}
+                                placeholder={replyFormState.placeholder}
+                                actionText={replyFormState.actionText}
+                                user={replyFormState.user}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             )}
-        </div>
+        </motion.div>
     );
 }
 

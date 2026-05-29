@@ -1,5 +1,15 @@
+import { motion } from "motion/react";
 import PropTypes from "prop-types";
 import Comment from "./Comment";
+
+const containerVariants = {
+    hidden: {},
+    visible: {
+        transition: {
+            staggerChildren: 0.02,
+        },
+    },
+};
 
 export default function Replies({ replies, actions }) {
     let sortedReplies = replies.sort((a, b) => a.createdAt - b.createdAt);
@@ -7,13 +17,26 @@ export default function Replies({ replies, actions }) {
     return replies?.length == 0 ? (
         <></>
     ) : (
-        <ul
-            className="border-l-2 pl-5 flex flex-col gap-4
+        <motion.ul
+            className="border-l-2 border-blue-200/40 pl-5 flex flex-col gap-4
           sm:py-0 sm:pl-12"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
         >
             {sortedReplies.map((reply) => {
                 return (
-                    <li key={reply.id}>
+                    <motion.li
+                        key={reply.id}
+                        variants={{
+                            hidden: { opacity: 0, y: 4 },
+                            visible: {
+                                opacity: 1,
+                                y: 0,
+                                transition: { duration: 0.12, ease: "easeOut" },
+                            },
+                        }}
+                    >
                         <Comment
                             id={reply.id}
                             content={reply.content}
@@ -25,10 +48,10 @@ export default function Replies({ replies, actions }) {
                             commentID={reply.commentID}
                             actions={actions}
                         />
-                    </li>
+                    </motion.li>
                 );
             })}
-        </ul>
+        </motion.ul>
     );
 }
 
