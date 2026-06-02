@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -5,17 +6,33 @@ import { z } from "zod";
 import FileInput from "./FileInput";
 import { useEffect } from "react";
 
-function Input(props) {
+function Input({ disabled, ...props }) {
     return (
-        <span className="border-2 p-2 rounded-md focus-within:border-black focus-within:border flex-grow">
+        <span
+            className={`border p-2 rounded-lg flex-grow transition-all duration-150 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-300/20 ${
+                disabled
+                    ? "border-blue-200/30 bg-white-80 opacity-60"
+                    : "border-blue-200/60"
+            }`}
+        >
             <input
                 type="text"
-                className="outline-none border-none"
+                className="outline-none border-none w-full bg-transparent"
+                disabled={disabled}
                 {...props}
             />
         </span>
     );
 }
+
+Input.propTypes = {
+    disabled: PropTypes.bool,
+    placeholder: PropTypes.string,
+    name: PropTypes.string,
+    value: PropTypes.string,
+    type: PropTypes.string,
+    onChange: PropTypes.func,
+};
 
 const formSchema = z.object({
     username: z.string(),
@@ -35,6 +52,7 @@ function AuthForm({ onAuthSuccess }) {
     const {
         data: authData,
         error: authFailed,
+        isPending: authPending,
         mutate: authenticate,
     } = useMutation({
         mutationFn: async (data) => {
@@ -93,12 +111,22 @@ function AuthForm({ onAuthSuccess }) {
     }, [authData]);
 
     return (
-        <div className="bg-white-100 self-end rounded-2xl p-8 mt-8 w-full md:w-max max-w-full">
+        <motion.div
+            className="bg-white-100 self-end rounded-2xl p-8 mt-8 w-full md:w-max max-w-full shadow-card"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+        >
             <div className="container w-full relative">
                 {authFailed && (
-                    <div className={"text-sm py-2 text-red-500"}>
+                    <motion.div
+                        className="text-sm py-2 text-red-100"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.1 }}
+                    >
                         {authFailed.message}
-                    </div>
+                    </motion.div>
                 )}
 
                 <form
@@ -106,15 +134,16 @@ function AuthForm({ onAuthSuccess }) {
                     className="flex flex-col gap-6 max-w-lg"
                     onSubmit={handleSubmit}
                 >
-                    <h3 className="font-bold text-blue-700">
-                        {"Sign Up/Log In"}
+                    <h3 className="font-bold text-blue-600 text-lg">
+                        {"Sign Up / Log In"}
                     </h3>
                     <main className="flex flex-wrap gap-4 items-center w-full">
-                        <div className="flex flex-wrap gap-2 w-full">
+                        <div className="flex flex-wrap gap-3 w-full">
                             <Input
                                 placeholder="@johndoe"
                                 name="username"
                                 value={username}
+                                disabled={authPending}
                                 onChange={(evt) => {
                                     let updatedUsername = evt.target.value;
                                     updatedUsername = updatedUsername.replace(
@@ -130,37 +159,63 @@ function AuthForm({ onAuthSuccess }) {
                                 placeholder="Enter Password"
                                 name="password"
                                 value={password}
+                                disabled={authPending}
                                 onChange={(evt) =>
                                     setPassword(evt.currentTarget.value)
                                 }
                             />
                         </div>
                         {authData?.signUp && (
-                            <div className="flex md:flex-nowrap flex-wrap items-center justify-center gap-2">
+                            <motion.div
+                                className="flex md:flex-nowrap flex-wrap items-center justify-center gap-3"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                transition={{ duration: 0.1 }}
+                            >
                                 <Input
                                     type="password"
                                     placeholder="Confirm Password"
                                     name="confirmedPassword"
                                     value={confirmedPassword}
+                                    disabled={authPending}
                                     onChange={(evt) =>
                                         setConfirmedPassword(
                                             evt.currentTarget.value,
                                         )
                                     }
                                 />
-                                <FileInput />
-                            </div>
+                                <FileInput disabled={authPending} />
+                            </motion.div>
                         )}
                     </main>
-                    <button
+                    <motion.button
                         type="submit"
-                        className="bg-blue-700 p-4 rounded-md text-white-100 font-semibold"
+                        disabled={authPending}
+                        className="bg-blue-300 p-4 rounded-xl text-white-100 font-bold cursor-pointer
+                          transition-all duration-150 hover:shadow-md hover:brightness-110
+                          disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:brightness-100"
+                        whileTap={authPending ? {} : { scale: 0.98 }}
                     >
-                        Sign Up/Log In
-                    </button>
+                        {authPending ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <motion.span
+                                    className="inline-block size-4 border-2 border-white-100/30 border-t-white-100 rounded-full"
+                                    animate={{ rotate: 360 }}
+                                    transition={{
+                                        duration: 0.8,
+                                        repeat: Infinity,
+                                        ease: "linear",
+                                    }}
+                                />
+                                Signing in...
+                            </span>
+                        ) : (
+                            "Sign Up / Log In"
+                        )}
+                    </motion.button>
                 </form>
             </div>
-        </div>
+        </motion.div>
     );
 }
 

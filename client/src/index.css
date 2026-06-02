@@ -3,10 +3,25 @@
 @tailwind utilities;
 
 @layer base {
+    *,
+    *::before,
+    *::after {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    ::selection {
+        background-color: hsl(239, 57%, 85% / 0.4);
+    }
+
     #root {
         min-height: 100vh;
         background-color: hsl(223, 19%, 93%);
-        transition: 0.3s ease-in-out;
+        transition: background-color 0.3s ease;
     }
 
     .author {
@@ -15,6 +30,8 @@
 
     .modal-bg {
         background-color: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
 
     @media (min-width: 640px) {
