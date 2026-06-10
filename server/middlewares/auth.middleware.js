@@ -1,5 +1,6 @@
 const db = require("../db");
 const jwt = require("jsonwebtoken");
+const { getR2Url } = require("../util/r2");
 
 async function refreshWithToken(req, res, next) {
     const { refreshToken } = req.cookies;
@@ -38,7 +39,14 @@ async function refreshWithToken(req, res, next) {
         return next();
     }
 
-    req.user = decoded;
+    req.user = {
+        ...decoded,
+        image: {
+            ...decoded.image,
+            png: getR2Url(decoded.image.png),
+        },
+    };
+
     return next();
 }
 

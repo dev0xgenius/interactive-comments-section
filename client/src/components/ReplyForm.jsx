@@ -47,7 +47,12 @@ export default function ReplyForm(props) {
                         width="100%"
                         height="auto"
                         className="w-full max-w-full object-cover"
-                        alt="Username avatar"
+                        alt={props.user.username}
+                        onError={(e) => {
+                            e.target.src =
+                                "/images/avatars/default-user-avatar.png";
+                            e.target.onerror = null;
+                        }}
                     />
                 </span>
                 <motion.button
@@ -85,7 +90,6 @@ ReplyForm.propTypes = {
     user: PropTypes.shape({
         image: PropTypes.shape({
             png: PropTypes.string.isRequired,
-            webp: PropTypes.string,
         }).isRequired,
         username: PropTypes.string.isRequired,
     }),

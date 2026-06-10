@@ -1,10 +1,9 @@
-import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
-import FileInput from "./FileInput";
-import { useEffect } from "react";
+import { FileInput } from "";
 
 function Input({ disabled, ...props }) {
     return (

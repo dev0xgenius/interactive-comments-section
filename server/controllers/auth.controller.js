@@ -4,6 +4,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
+const { getR2Url, uploadToR2 } = require("../util/r2");
 
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
@@ -42,7 +43,15 @@ async function handleAuthentication(req, res) {
 
     if (!passwordMatched) return res.status(403).end("Invalid Credentials");
 
-    req.user = foundUser;
+    console.log(foundUser);
+    req.user = {
+        ...foundUser,
+        image: {
+            ...foundUser.image,
+            png: getR2Url(foundUser.image.png),
+        },
+    };
+
     await signIn(req, res);
 }
 
@@ -89,10 +98,26 @@ async function signUp(req, res) {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const file = req?.file;
+    let urlKey;
+
+    if (file) {
+        try {
+            urlKey = `comment-section-avatars/${username}-${Date.now}-.${path.extname(file.path)}`;
+            await uploadToR2(
+                process.env.R2_BUCKET_NAME,
+                urlKey,
+                file.buffer,
+                file.mimetype,
+            );
+        } catch (e) {
+            urlKey = `comment-section-avatars/default-user-avater.jpg`;
+            console.log(e);
+        }
+    }
 
     let newUser;
-    const imageUrl = req?.file?.path ?? "avatars/test-avatar.jpg";
-
+    const imageUrl = urlKey;
     try {
         newUser = await db.query(
             "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",

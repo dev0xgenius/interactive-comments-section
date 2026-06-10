@@ -1,4 +1,5 @@
 const db = require("../db");
+const { getR2Url } = require("../util/r2.js");
 
 const {
     addComment,
@@ -14,7 +15,7 @@ async function resolveComment(comment) {
         resolvedComment = {
             ...comment,
             user: {
-                image: { png: user.image_url, webp: "" },
+                image: { png: getR2Url(user.image_url), webp: "" },
                 username: user.username,
             },
             createdAt: new Date(comment.created_at).getTime(),
