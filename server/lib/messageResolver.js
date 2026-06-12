@@ -15,7 +15,7 @@ async function resolveComment(comment) {
         resolvedComment = {
             ...comment,
             user: {
-                image: { png: getR2Url(user.image_url), webp: "" },
+                image: { png: user.image_url, webp: "" },
                 username: user.username,
             },
             createdAt: new Date(comment.created_at).getTime(),

@@ -8,7 +8,7 @@ export default function UserTag({ user }) {
 
     return (
         <span className="user flex gap-4 items-center">
-            <span className="block size-10 rounded-full border overflow-hidden shadow-sm">
+            <span className="block size-10 rounded-full overflow-hidden shadow-sm">
                 <img
                     src={user.image.png}
                     width="100%"

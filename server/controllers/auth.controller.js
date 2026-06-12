@@ -1,10 +1,7 @@
-const fsPromises = require("fs/promises");
-const path = require("path");
-
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
-const { getR2Url, uploadToR2 } = require("../util/r2");
+const { getR2Url } = require("../util/r2");
 
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
@@ -43,15 +40,7 @@ async function handleAuthentication(req, res) {
 
     if (!passwordMatched) return res.status(403).end("Invalid Credentials");
 
-    console.log(foundUser);
-    req.user = {
-        ...foundUser,
-        image: {
-            ...foundUser.image,
-            png: getR2Url(foundUser.image.png),
-        },
-    };
-
+    req.user = foundUser;
     await signIn(req, res);
 }
 
@@ -93,31 +82,16 @@ async function signIn(req, res) {
 }
 
 async function signUp(req, res) {
-    let { username, password } = req?.body;
+    let { username, password, avatar } = req?.body;
     username = username.trim().replace(/\s+/g, "").toLowerCase();
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const file = req?.file;
-    let urlKey;
 
-    if (file) {
-        try {
-            urlKey = `comment-section-avatars/${username}-${Date.now}-.${path.extname(file.path)}`;
-            await uploadToR2(
-                process.env.R2_BUCKET_NAME,
-                urlKey,
-                file.buffer,
-                file.mimetype,
-            );
-        } catch (e) {
-            urlKey = `comment-section-avatars/default-user-avater.jpg`;
-            console.log(e);
-        }
-    }
+    const imageUrl =
+        avatar ||
+        `https://api.dicebear.com/9.x/adventurer/png?seed=${username}`;
 
     let newUser;
-    const imageUrl = urlKey;
     try {
         newUser = await db.query(
             "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
@@ -125,7 +99,6 @@ async function signUp(req, res) {
         );
     } catch (e) {
         console.log(e);
-        req?.file && fsPromises.unlink(path.join(req?.file.path));
         return res.status(500).end("Server failure");
     }
 

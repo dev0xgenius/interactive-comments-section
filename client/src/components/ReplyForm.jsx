@@ -41,7 +41,7 @@ export default function ReplyForm(props) {
                 defaultValue={props.content}
             ></textarea>
             <div className="flex justify-between gap-4 items-center">
-                <span className="block size-10 rounded-full border overflow-hidden shadow-sm">
+                <span className="block size-10 rounded-full overflow-hidden shadow-sm">
                     <img
                         src={props.user.image.png}
                         width="100%"
