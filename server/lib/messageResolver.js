@@ -1,5 +1,4 @@
 const db = require("../db");
-const { getR2Url } = require("../util/r2.js");
 
 const {
     addComment,
