@@ -1,10 +1,9 @@
-import { motion } from "motion/react";
 import { useMutation } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
-import FileInput from "./FileInput";
-import { useEffect } from "react";
+import AvatarPicker from "./AvatarPicker";
 
 function Input({ disabled, ...props }) {
     return (
@@ -59,6 +58,7 @@ function AuthForm({ onAuthSuccess }) {
             const requestUrl = "/auth";
             const request = new Request(requestUrl, {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: data,
             });
 
@@ -87,10 +87,11 @@ function AuthForm({ onAuthSuccess }) {
 
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        const formData = new FormData(evt.target);
         const serializedData = {
             username,
             password,
+            confirmedPassword,
+            avatar: evt.target.avatar?.value,
         };
 
         const validateForm = formSchema.safeParse(serializedData);
@@ -99,7 +100,7 @@ function AuthForm({ onAuthSuccess }) {
             return;
         }
 
-        authenticate(formData);
+        authenticate(JSON.stringify(serializedData));
     };
 
     useEffect(() => {
@@ -130,7 +131,6 @@ function AuthForm({ onAuthSuccess }) {
                 )}
 
                 <form
-                    encType="multipart/form-data"
                     className="flex flex-col gap-6 max-w-lg"
                     onSubmit={handleSubmit}
                 >
@@ -184,7 +184,7 @@ function AuthForm({ onAuthSuccess }) {
                                         )
                                     }
                                 />
-                                <FileInput disabled={authPending} />
+                                <AvatarPicker disabled={authPending} username={username} />
                             </motion.div>
                         )}
                     </main>

@@ -42,9 +42,6 @@ async function refreshWithToken(req, res, next) {
     return next();
 }
 
-async function verifyToken(req, res, next) {}
-
 module.exports = {
     refreshWithToken,
-    verifyToken,
 };

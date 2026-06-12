@@ -1,9 +1,7 @@
-const fsPromises = require("fs/promises");
-const path = require("path");
-
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
+const { getR2Url } = require("../util/r2");
 
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
@@ -84,15 +82,16 @@ async function signIn(req, res) {
 }
 
 async function signUp(req, res) {
-    let { username, password } = req?.body;
+    let { username, password, avatar } = req?.body;
     username = username.trim().replace(/\s+/g, "").toLowerCase();
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    let newUser;
-    const imageUrl = req?.file?.path ?? "avatars/test-avatar.jpg";
+    const imageUrl =
+        avatar ||
+        `https://api.dicebear.com/9.x/adventurer/png?seed=${username}`;
 
+    let newUser;
     try {
         newUser = await db.query(
             "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
@@ -100,7 +99,6 @@ async function signUp(req, res) {
         );
     } catch (e) {
         console.log(e);
-        req?.file && fsPromises.unlink(path.join(req?.file.path));
         return res.status(500).end("Server failure");
     }
 

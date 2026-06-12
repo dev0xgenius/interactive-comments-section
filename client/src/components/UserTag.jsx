@@ -8,8 +8,18 @@ export default function UserTag({ user }) {
 
     return (
         <span className="user flex gap-4 items-center">
-            <span className="block size-10 rounded-full border overflow-hidden shadow-sm">
-                <img src={user.image.png} width="100%" height="auto" alt={user.username} />
+            <span className="block size-10 rounded-full overflow-hidden shadow-sm">
+                <img
+                    src={user.image.png}
+                    width="100%"
+                    height="auto"
+                    alt={user.username}
+                    onError={(e) => {
+                        e.target.src =
+                            "/images/avatars/default-user-avatar.png";
+                        e.target.onerror = null;
+                    }}
+                />
             </span>
             <span className="flex gap-2 justify-center items-center">
                 <span className="author">{user.username}</span>

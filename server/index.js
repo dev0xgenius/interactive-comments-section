@@ -27,19 +27,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(authRouter);
 
-app.get("/avatars/:avatar", (req, res) => {
-    const { avatar } = req.params;
-    const name = path.basename(avatar);
-    const avatarsDir = path.join(__dirname, "avatars");
-
-    res.sendFile(name, { root: avatarsDir }, (err) => {
-        if (err) {
-            console.log(`Error: ${err}`);
-            res.status(500).end("Couldn't complete the request");
-        }
-    });
-});
-
 async function getChatMessages() {
     let comments;
     try {
