@@ -24,15 +24,6 @@ function Input({ disabled, ...props }) {
     );
 }
 
-Input.propTypes = {
-    disabled: PropTypes.bool,
-    placeholder: PropTypes.string,
-    name: PropTypes.string,
-    value: PropTypes.string,
-    type: PropTypes.string,
-    onChange: PropTypes.func,
-};
-
 const formSchema = z.object({
     username: z.string(),
     password: z.string(),
@@ -150,6 +141,11 @@ function AuthForm({ onAuthSuccess }) {
                                         /\s/gi,
                                         "",
                                     );
+                                    updatedUsername =
+                                        updatedUsername.replace(
+                                            /[^a-zA-Z0-9_-]/g,
+                                            "",
+                                        );
 
                                     setUsername(updatedUsername);
                                 }}
@@ -184,7 +180,10 @@ function AuthForm({ onAuthSuccess }) {
                                         )
                                     }
                                 />
-                                <AvatarPicker disabled={authPending} username={username} />
+                                <AvatarPicker
+                                    disabled={authPending}
+                                    username={username}
+                                />
                             </motion.div>
                         )}
                     </main>
@@ -222,6 +221,15 @@ function AuthForm({ onAuthSuccess }) {
 export default function Auth({ onAuthSuccess }) {
     return <AuthForm onAuthSuccess={onAuthSuccess} />;
 }
+
+Input.propTypes = {
+    disabled: PropTypes.bool,
+    placeholder: PropTypes.string,
+    name: PropTypes.string,
+    value: PropTypes.string,
+    type: PropTypes.string,
+    onChange: PropTypes.func,
+};
 
 Auth.propTypes = {
     onAuthSuccess: PropTypes.func,

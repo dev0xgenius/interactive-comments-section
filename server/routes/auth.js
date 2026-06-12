@@ -9,7 +9,6 @@ const {
 const { refreshWithToken } = require("../middlewares/auth.middleware.js");
 
 authRouter.post("/auth", refreshWithToken, handleAuthentication);
-
 authRouter.post("/auth/signout", handleSignout);
 
 module.exports = {

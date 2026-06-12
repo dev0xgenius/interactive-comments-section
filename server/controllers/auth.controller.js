@@ -1,13 +1,22 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../db");
-const { getR2Url } = require("../util/r2");
+
+const USERNAME_REGEX = /^[a-zA-Z0-9_.-]+$/;
 
 async function handleAuthentication(req, res) {
     if (req.user) return res.status(200).json(req.user);
 
     const { username, password, confirmedPassword } = req?.body;
     if (!username || !password) return res.status(400).end("Missing fields");
+
+    if (!USERNAME_REGEX.test(username)) {
+        return res
+            .status(400)
+            .end(
+                "Username can only contain letters, numbers, underscores, hyphens, and periods.",
+            );
+    }
 
     if (confirmedPassword && confirmedPassword !== password) {
         console.log("Password does not match");
