@@ -15,7 +15,7 @@ function createAvatarList(username) {
 }
 
 function avatarUrl(seed) {
-    return `${AVATAR_BASE}?seed=${seed}`;
+    return `${AVATAR_BASE}?seed=${encodeURIComponent(seed)}`;
 }
 
 function Skeleton({ isLoaded }) {
