@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const db = require("../db");
+const { db } = require("../db");
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_.-]+$/;
 
@@ -25,15 +25,13 @@ async function handleAuthentication(req, res) {
 
     let foundUser;
     try {
-        foundUser = await db.query(
-            "SELECT id,password_hash,username,image_url FROM users WHERE username=$1",
-            [username],
-        );
-
-        foundUser = foundUser.rows[0];
+        foundUser = await db("users")
+            .select("id", "password_hash", "username", "image_url")
+            .where({ username })
+            .first();
     } catch (err) {
         console.log(err);
-        res.status(500).end();
+        return res.status(500).end();
     }
 
     if (!foundUser) {
@@ -70,14 +68,10 @@ async function signIn(req, res) {
     );
 
     try {
-        await db.query("INSERT INTO auth.auth(username, token) VALUES($1,$2)", [
-            username,
-            refreshToken,
-        ]);
+        await db("auth.auth").insert({ username, token: refreshToken });
     } catch (e) {
         console.log(e);
-        console.log("DB error");
-        res.status(500).end("Internal Server Error");
+        return res.status(500).end("Internal Server Error");
     }
 
     res.cookie("refreshToken", refreshToken, {
@@ -100,12 +94,12 @@ async function signUp(req, res) {
         avatar ||
         `https://api.dicebear.com/9.x/adventurer/png?seed=${username}`;
 
-    let newUser;
     try {
-        newUser = await db.query(
-            "INSERT INTO users(username, password_hash, image_url) VALUES($1,$2,$3) RETURNING *",
-            [username, hashedPassword, imageUrl],
-        );
+        await db("users").insert({
+            username,
+            password_hash: hashedPassword,
+            image_url: imageUrl,
+        });
     } catch (e) {
         console.log(e);
         return res.status(500).end("Server failure");
@@ -114,10 +108,10 @@ async function signUp(req, res) {
     return res.status(204).end("Account created successfully");
 }
 
-async function handleSignout(req, res, next) {
+async function handleSignout(req, res) {
     const { username } = req?.body;
     try {
-        await db.query("DELETE FROM auth.auth WHERE username=$1", [username]);
+        await db("auth.auth").where({ username }).del();
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
