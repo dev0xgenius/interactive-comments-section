@@ -1,4 +1,4 @@
-const db = require("../db");
+const { db } = require("../db");
 const jwt = require("jsonwebtoken");
 
 async function refreshWithToken(req, res, next) {
@@ -7,11 +7,10 @@ async function refreshWithToken(req, res, next) {
 
     let foundUser;
     try {
-        foundUser = await db.query("SELECT * FROM auth.auth WHERE token=$1", [
-            refreshToken,
-        ]);
+        foundUser = await db("auth.auth")
+            .where({ token: refreshToken })
+            .first();
 
-        foundUser = foundUser.rows[0];
         if (!foundUser) {
             res.clearCookie("refreshToken", {
                 httpOnly: true,
