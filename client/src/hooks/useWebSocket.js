@@ -1,73 +1,52 @@
 import { useEffect, useRef } from "react";
 
 export default function useWebSocket(url, handleMessage) {
-    let messages = useRef(null);
-    let messageHandler = useRef((data) =>
-        console.log(
-            "Nothing to do with ",
-            JSON.stringify(data),
-            " at this moment...",
-        ),
+    let resolveInitialMessages = null;
+    const messagesPromise = useRef(
+        new Promise((resolve) => {
+            resolveInitialMessages = resolve;
+        }),
     );
+    const messageHandler = useRef(null);
 
-    const loadMessages = () => {
-        return new Promise((resolve, reject) => {
-            let t = setInterval(() => {
-                if (messages.current != null) {
-                    clearInterval(t);
-                    resolve(messages.current);
-                }
-            }, 500);
-
-            setTimeout(() => {
-                if (messages.current) {
-                    clearInterval(t);
-                    return;
-                }
-
-                clearInterval(t);
-                reject("Timeout: Couldn't fetch data within 5 seconds");
-            }, 5000);
-        });
-    };
+    const loadMessages = () => messagesPromise.current;
 
     useEffect(() => {
         const websocket = new WebSocket(url);
+
         websocket.onopen = () => {
             messageHandler.current = (data) => {
-                data = {
-                    type: "chat",
-                    payload: data,
-                    timestamp: Date.now(),
-                };
-
-                websocket.send(JSON.stringify(data));
+                websocket.send(
+                    JSON.stringify({
+                        type: "chat",
+                        payload: data,
+                        timestamp: Date.now(),
+                    }),
+                );
             };
         };
 
-        websocket.addEventListener(
-            "message",
-            (event) => {
-                if (event.data != undefined) {
-                    messages.current = JSON.parse(event.data);
-                }
+        websocket.onmessage = (event) => {
+            if (event.data) {
+                const data = JSON.parse(event.data);
 
-                websocket.addEventListener("message", (event) => {
-                    const { data } = event;
-                    if (data) handleMessage(JSON.parse(data));
-                });
-            },
-            { once: true },
-        );
+                if (resolveInitialMessages) {
+                    resolveInitialMessages(data);
+                    resolveInitialMessages = null;
+                } else {
+                    handleMessage(data);
+                }
+            }
+        };
 
         websocket.onerror = () => {
-            console.error("Unable to fetch data...");
+            console.error("WebSocket connection error");
         };
 
         return () => {
             websocket.close();
         };
-    }, [messages, handleMessage, url]);
+    }, [url, handleMessage]);
 
     return [loadMessages, messageHandler.current];
 }
