@@ -5,7 +5,9 @@
     "type": "commonjs",
     "scripts": {
         "start": "nodemon index",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "migrate": "knex migrate:latest --knexfile knexfile.js",
+        "migrate:rollback": "knex migrate:rollback --knexfile knexfile.js"
     },
     "author": "0xG3nius",
     "license": "ISC",
