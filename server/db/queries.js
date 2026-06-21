@@ -1,14 +1,13 @@
-const db = require("./index.js");
-const uuid = require("uuid");
+const { db } = require("./index");
+const { v4: uuid } = require("uuid");
 
 async function addComment(comment) {
     let { userID, content, score } = comment;
     try {
-        let result = await db.query(
-            "INSERT INTO comments(user_id,content,score) VALUES($1,$2,$3) RETURNING *",
-            [userID, content, score],
-        );
-        return result.rows[0];
+        const [row] = await db("comments")
+            .insert({ user_id: userID, content, score })
+            .returning("*");
+        return row;
     } catch (e) {
         throw e;
     }
@@ -18,30 +17,32 @@ async function addReply(reply) {
     let { replyingTo } = reply;
 
     try {
-        let result = await db.query(
-            `
-      INSERT INTO replies(id,user_id,replying_to,content,score) 
-      VALUES($1,$2,$3,$4,$5) RETURNING *
-    `,
-            [
-                reply.id,
-                reply.userID,
-                reply.commentID,
-                reply.content,
-                reply.score,
-            ],
-        );
+        const [row] = await db("replies")
+            .insert({
+                id: reply.id,
+                user_id: reply.userID,
+                replying_to: reply.commentID,
+                content: reply.content,
+                score: reply.score,
+            })
+            .returning("*");
 
-        result = result.rows[0];
-        result.replyingTo = await db.getUsernameFromCommentId(
-            result.replying_to,
-        );
-
-        result.replyingTo = `${result.replyingTo}, ${replyingTo}`;
-        return result;
+        row.replyingTo = await getUsernameFromCommentId(row.replying_to);
+        row.replyingTo = `${row.replyingTo}, ${replyingTo}`;
+        return row;
     } catch (e) {
         throw e;
     }
+}
+
+async function getUsernameFromCommentId(id) {
+    const result = await db("comments")
+        .join("users", "comments.user_id", "users.id")
+        .where("comments.id", id)
+        .select("users.username")
+        .first();
+
+    return result?.username;
 }
 
 function handleDelete({ id }) {
@@ -49,46 +50,38 @@ function handleDelete({ id }) {
 }
 
 async function repliesExist(commentID) {
-    let result = await db.query(
-        "SELECT COUNT(*) FROM replies WHERE replying_to=$1",
-        [commentID],
-    );
+    const [row] = await db("replies")
+        .where({ replying_to: commentID })
+        .count()
+        .first();
 
-    return !!result.rows[0];
+    return !!row?.count;
 }
 
 async function deleteComment(id) {
     try {
-        repliesExist(id) && (await deleteReplies(id));
-        const deletedComment = await db.query(
-            "DELETE FROM comments WHERE id=$1 RETURNING *",
-            [id],
-        );
-
-        return deletedComment.rows[0];
+        const exists = await repliesExist(id);
+        if (exists) {
+            await db("replies").where({ replying_to: id }).del();
+        }
+        const [deleted] = await db("comments")
+            .where({ id })
+            .del()
+            .returning("*");
+        return deleted;
     } catch (e) {
         console.log("FAILED TO DELETE COMMENT");
         throw e;
     }
 }
 
-async function deleteReplies(commentID) {
-    try {
-        await db.query("DELETE FROM replies WHERE replying_to=$1", [commentID]);
-    } catch (e) {
-        console.log("FAILED TO DELETE REPLIES ON COMMENT: ", commentID);
-        throw e;
-    }
-}
-
 async function deleteReply(id) {
     try {
-        const deletedReply = await db.query(
-            "DELETE FROM replies WHERE id=$1 RETURNING *",
-            [id],
-        );
-
-        return deletedReply.rows[0];
+        const [deleted] = await db("replies")
+            .where({ id })
+            .del()
+            .returning("*");
+        return deleted;
     } catch (e) {
         console.log("FAILED TO DELETE REPLY");
         throw e;
@@ -104,17 +97,18 @@ async function editReply(data) {
     let column_value = data.content ? String(data.content) : Number(data.score);
 
     try {
-        let result = !uuid.validate(id)
-            ? await db.query(
-                  `UPDATE replies SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id,replying_to`,
-                  [column_value, id],
-              )
-            : await db.query(
-                  `UPDATE comments SET "${column_name}"=$1 WHERE id=$2 RETURNING "${column_name}",id`,
-                  [column_value, id],
-              );
+        const table = !uuid.validate(id) ? "replies" : "comments";
+        const selectColumns =
+            table === "replies"
+                ? ["id", column_name, "replying_to"]
+                : ["id", column_name];
 
-        return result.rows[0];
+        const [row] = await db(table)
+            .where({ id })
+            .update({ [column_name]: column_value })
+            .returning(selectColumns);
+
+        return row;
     } catch (e) {
         throw e;
     }
