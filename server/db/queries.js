@@ -1,4 +1,3 @@
-// TODO: Alter id in replies table to use uuid
 const db = require("./index.js");
 const uuid = require("uuid");
 
@@ -99,7 +98,9 @@ async function deleteReply(id) {
 async function editReply(data) {
     let { id } = data;
 
+    const ALLOWED_COLUMNS = { content: true, score: true };
     let column_name = data.content ? "content" : "score";
+    column_name = ALLOWED_COLUMNS[column_name] ? column_name : "content";
     let column_value = data.content ? String(data.content) : Number(data.score);
 
     try {
