@@ -1,88 +1,54 @@
-const path = require("path");
-const uuid = require("uuid");
-const { Pool } = require("pg");
-
-require("dotenv").config({ path: path.join(__dirname, "../../.env") });
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
-
-pool.on("error", (err, client) => {
-    console.log(
-        `A flabbergasting error has occured. Error: ${err}. 
-        Na ${JSON.stringify(client)} cause am`,
-    );
-    process.exit(-1);
-});
-
-const query = async (text, params) => {
-    return await pool.query(text, params);
-};
+const db = require("./knex");
 
 const getComments = async () => {
     try {
-        let comments = await pool.query(
-            `SELECT id,user_id,score,content,created_at FROM comments`,
+        const comments = await db("comments").select(
+            "id",
+            "user_id",
+            "score",
+            "content",
+            "created_at",
         );
-
-        return comments.rows;
+        return comments;
     } catch (error) {
         throw `Failed to get comments: ${error}`;
     }
 };
 
 const getUser = async (userId) => {
-    try {
-        if (!uuid.validate(userId)) {
-            throw new Error("User doesn't exist", {
-                cause: "Invalid User ID",
-            });
-        }
-
-        const queryResult = await pool.query(
-            `SELECT * FROM users WHERE id=$1`,
-            [userId],
-        );
-
-        const user = queryResult.rows[0] || false;
-        return user;
-    } catch (err) {
-        return err;
+    const { v4: uuid } = require("uuid");
+    if (!uuid.validate(userId)) {
+        throw new Error("User doesn't exist", {
+            cause: "Invalid User ID",
+        });
     }
+
+    const user = await db("users").where({ id: userId }).first();
+    return user || false;
 };
 
-const getReplies = (commentId) => {
-    return new Promise((resolve, reject) => {
-        if (!uuid.validate(commentId))
-            reject(
-                new Error("User doesn't exist", { cause: "Invalid User ID" }),
-            );
+const getReplies = async (commentId) => {
+    const { v4: uuid } = require("uuid");
+    if (!uuid.validate(commentId)) {
+        throw new Error("Invalid Comment ID", { cause: "Invalid User ID" });
+    }
 
-        pool.query(`SELECT * FROM replies WHERE replying_to=$1`, [commentId])
-            .then((data) => {
-                data.rows = data.rows.map((row) => ({
-                    ...row,
-                    id: row.id,
-                }));
-                resolve(data.rows);
-            })
-            .catch(reject);
-    });
+    const rows = await db("replies").where({ replying_to: commentId });
+    return rows.map((row) => ({ ...row }));
 };
 
 const getUsernameFromCommentId = async (id) => {
-    const usernameQuery = await pool.query(
-        "SELECT username FROM users WHERE id=(SELECT user_id FROM comments WHERE id=$1)",
-        [id],
-    );
+    const result = await db("comments")
+        .join("users", "comments.user_id", "users.id")
+        .where("comments.id", id)
+        .select("users.username")
+        .first();
 
-    let { username } = usernameQuery.rows[0];
-    return username;
+    return result?.username;
 };
 
 module.exports = {
-    query,
+    db,
     getComments,
     getUser,
     getReplies,
